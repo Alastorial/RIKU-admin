@@ -2,9 +2,15 @@ import React from 'react';
 import st from "./auth.module.css"
 import {useForm} from "react-hook-form";
 import * as bcrypt from "bcryptjs-react";
+import {useDispatch, useSelector} from "react-redux";
+import {fetchAuth, selectIsAuth} from "../../redux/slices/auth";
+import {Redirect} from "react-router-dom";
 
 
 export const Auth = () => {
+    const dispatch = useDispatch()
+    const isAuth = useSelector(selectIsAuth)
+    console.log(isAuth)
 
     const { register, handleSubmit, formState: {errors}, reset } = useForm({
         defaultValues: {
@@ -14,10 +20,21 @@ export const Auth = () => {
         mode: "onChange"
     })
 
-    const onSubmit = async (data) => {
-        console.log(data)
+    const onSubmit = async (value) => {
+        const data = await dispatch(fetchAuth(value))
+        if (!data.payload) {
+            return alert("Не удалось авторизоваться!")
+        }
 
-        reset()
+        // сохраняем токен в локал хранилище браузера
+        if ('token' in data.payload) {
+            window.localStorage.setItem('token', data.payload.token);
+        }
+        // reset()
+    }
+
+    if (isAuth) {
+        return <Redirect to="/admin" />
     }
 
     return (
