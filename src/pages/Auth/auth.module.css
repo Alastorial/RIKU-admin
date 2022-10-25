@@ -1,0 +1,71 @@
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+.container {
+    box-sizing: border-box;
+    position: relative;
+    margin: 0 auto;
+    padding: 0 20px;
+    max-width: 1440px;
+    font-family: "Noah Head", sans-serif;
+    font-size: 16px;
+}
+
+.authBlock {
+    position: fixed;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    padding: 20px;
+    max-width: 600px;
+}
+
+.input {
+    font-family: "Noah Head", sans-serif;
+    width: 100%;
+    margin-top: 15px;
+    padding: 0 0 0 20px;
+    font-size: 15px;
+    height: 50px;
+    border-radius: 4px;
+    border: #D9D9D9 1px solid;
+    outline-color: #dbecff;
+}
+
+.inputErrorMessage {
+    height: 15px;
+    color: #cc0101;
+    padding-top: 2px;
+    font-weight: 400;
+    padding-left: 2px;
+    font-size: 14px;
+}
+
+.subButtonBox {
+    display: flex;
+    margin-top: 15px;
+    width: 100%;
+    justify-content: right;
+}
+
+.submitButton {
+    cursor: pointer;
+    border: #d9d9d9 1px solid;
+    color: black;
+    font-weight: 400;
+    padding: 10px 20px;
+    font-family: "Noah Head", sans-serif;
+    background: none;
+    font-size: 18px;
+    border-radius: 6px;
+    transition: all 200ms ease-in;
+}
+
+.submitButton:hover {
+    background-color: #e9f4ff;
+    border: #c7e2ff 1px solid;
+}
