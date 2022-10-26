@@ -1,0 +1,74 @@
+.container {
+    margin: 0 auto;
+    padding: 0 20px;
+    max-width: 1440px;
+    font-family: "Noah Text", sans-serif;
+}
+
+.ourProjectsText {
+    display: block;
+    margin-top: 35px;
+    font-size: 48px;
+    text-align: center;
+    font-family: "Noah Text", sans-serif;
+    font-weight: 500;
+}
+
+.gallery {
+    margin: 15px auto 0 auto;
+    padding: 0 20px;
+    font-family: "Noah Text", sans-serif;
+    max-width: 1440px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+/* делаем нормальной последнюю строчку с проектами */
+.gallery:after {
+    flex-basis: calc((100% / 3) - 10px);
+    content: "";
+}
+
+
+.showMore {
+    display: block;
+    font-size: 17px;
+    font-family: "Noah Head", sans-serif;
+    font-weight: 400;
+    border: 2px #A7BCDB solid;
+    cursor: pointer;
+    height: 50px;
+    text-align: center;
+    width: 100%;
+    border-radius: 4px;
+    background: none;
+    transition: background 500ms ease;
+}
+
+.showMore:hover {
+    background: #f3f8ff;
+}
+
+@media (max-width: 1040px) {
+    .ourProjectsText {
+        font-size: 34px;
+    }
+}
+
+@media (max-width: 730px) {
+    .ourProjectsText {
+        margin-top: 15px;
+        margin-bottom: 10px;
+        font-size: 30px;
+    }
+}
+
+@media (max-width: 500px) {
+    .ourProjectsText {
+        font-size: 26px;
+    }
+}
+
+
+

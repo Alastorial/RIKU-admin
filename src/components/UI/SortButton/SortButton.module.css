@@ -1,0 +1,62 @@
+.arrow {
+    rotate: 0deg;
+    width: 25px;
+    height: 25px;
+    transition: rotate 700ms ease;
+    -webkit-transition: all 700ms ease;
+}
+
+.arrowOpened {
+    -webkit-transform: rotate(-180deg); /* Градусы поворота можно изменить по необходимости */
+    transform: rotate(-180deg); /* Градусы поворота можно изменить по необходимости */
+    -webkit-backface-visibility: hidden;
+}
+
+.sortButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: black;
+    border: 1px #A7BCDB solid;
+    padding: 3px 5px 3px 10px;
+    border-radius: 4px;
+    background: none;
+    cursor: pointer;
+    font-size: 17px;
+    font-family: "Noah Text", sans-serif;
+    font-weight: 400;
+    margin-right: 20px;
+    transition: background 300ms ease;
+}
+
+.sortButton span {
+    margin-right: 5px;
+}
+
+.sortButton:not(.sortButtonSelected):hover {
+    background: #f3f8ff;
+}
+
+.sortButtonSelected {
+    background: #D3DEED;
+}
+
+@media (max-width: 1040px) {
+
+}
+
+@media (max-width: 730px) {
+    .sortButton {
+        font-size: 15px;
+        margin-bottom: 10px;
+    }
+
+    .arrow {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+@media (max-width: 630px) {
+
+}

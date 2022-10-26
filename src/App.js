@@ -4,6 +4,7 @@ import {Admin, Auth} from "./pages/export";
 import {useDispatch} from "react-redux";
 import {useEffect} from "react";
 import {fetchAuthMe} from "./redux/slices/auth";
+import {OurProjects} from "./pages/OurProjects";
 
 
 function App() {
@@ -17,7 +18,8 @@ function App() {
     <div className="App">
       <Switch>
         <Route path="/auth"><Auth/></Route>
-        <Route path="/admin"><Admin/></Route>
+        <Route path="/admin/all"><OurProjects/></Route>
+        <Route path="/admin/:id"><Admin/></Route>
         <Redirect to="/auth"/>
       </Switch>
 

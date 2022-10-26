@@ -34,10 +34,11 @@ export const Auth = () => {
     }
 
     if (isAuth) {
-        return <Redirect to="/admin" />
+        return <Redirect to="/admin/all" />
     }
 
     return (
+
         <div className={st.container}>
             <div className={st.authBlock}>
                 <span style={{display: "inline-block", fontSize: 26, fontWeight: 400, marginBottom: 10}}>Войти</span>
