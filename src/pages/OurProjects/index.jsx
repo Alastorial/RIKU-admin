@@ -10,8 +10,8 @@ import axios from "../../axios";
 
 
 export const OurProjects = () => {
-
-
+    const dispatch = useDispatch()
+    const isAuth = useSelector(selectIsAuth)
 
 
     // дефолтные значения для фильтров на этой странице (передаем как пропсы)
@@ -29,13 +29,6 @@ export const OurProjects = () => {
         sortToUp: false
     });
 
-
-    const isAuth = useSelector(selectIsAuth)
-    const dispatch = useDispatch()
-    // console.log(isAuth)
-
-
-
     const onClickLogout = () => {
         if (window.confirm('Вы действительно хотите выйти ?')) {
             dispatch(logout()); // это делается именно так тк данные о пользователе хранятся в store, поэтому
@@ -46,6 +39,7 @@ export const OurProjects = () => {
 
     // данные о всех проектах
     const [projectsInfo, setProjectsInfo] = useState([])
+
     useEffect(() => {
         axios.get("/projects").then(res => {
             setProjectsInfo(res.data)

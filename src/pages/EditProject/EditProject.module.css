@@ -1,0 +1,52 @@
+.container {
+    margin: 0 auto;
+    padding: 0 20px;
+    max-width: 1440px;
+    font-family: "Noah Head", sans-serif;
+    font-size: 16px;
+}
+
+.title {
+    display: block;
+    font-family: "Noah Head", sans-serif;
+    margin-top: 20px;
+    font-size: 48px;
+    font-weight: 400;
+    text-align: center;
+}
+
+.input {
+    font-family: "Noah Head", sans-serif;
+    width: 100%;
+    margin-top: 15px;
+    padding: 0 0 0 20px;
+    font-size: 15px;
+    height: 50px;
+    border-radius: 4px;
+    border: #D9D9D9 1px solid;
+    outline-color: #dbecff;
+}
+
+.inputTags {
+    width: calc(20% - 5px);
+}
+
+.tagsBlock {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.textArea {
+    height: 300px;
+    resize: vertical;
+}
+
+.inputErrorMessage {
+    height: 15px;
+    color: #cc0101;
+    padding-top: 2px;
+    font-weight: 400;
+    padding-left: 2px;
+    font-size: 14px;
+}

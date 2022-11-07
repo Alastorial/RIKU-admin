@@ -12,7 +12,7 @@ function App() {
 
     useEffect(() => {
         dispatch(fetchAuthMe())
-    }, [])
+    }, [dispatch])
 
   return (
     <div className="App">

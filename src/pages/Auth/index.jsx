@@ -1,7 +1,6 @@
 import React from 'react';
 import st from "./auth.module.css"
 import {useForm} from "react-hook-form";
-import * as bcrypt from "bcryptjs-react";
 import {useDispatch, useSelector} from "react-redux";
 import {fetchAuth, selectIsAuth} from "../../redux/slices/auth";
 import {Redirect} from "react-router-dom";
@@ -12,7 +11,7 @@ export const Auth = () => {
     const isAuth = useSelector(selectIsAuth)
     console.log(isAuth)
 
-    const { register, handleSubmit, formState: {errors}, reset } = useForm({
+    const { register, handleSubmit, formState: {errors} } = useForm({
         defaultValues: {
             nickname: "",
             password: "",

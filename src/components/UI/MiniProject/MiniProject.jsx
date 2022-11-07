@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {motion} from 'framer-motion';
 import st from './MiniProject.module.css';
 import {ReactComponent as Area} from "../../../image/icons/area.svg";
@@ -7,57 +7,49 @@ import {ReactComponent as Eye} from "../../../image/icons/eye.svg";
 import MiniProjectLine from "../MiniProjectLine/MiniProjectLine";
 import {Link} from "react-router-dom";
 import axios from "../../../axios";
+import Loader from "../Loader/Loader";
 
-export const MiniProject = ({custom, project}) => {
+export const MiniProject = ({project}) => {
 
     // текущее фото
     const [currentPhoto, setCurrentPhoto] = useState();
 
 
-    // const imageUrls = useFetchPhoto(project);
+    // состояние для подгрузки очередной картинки
+    const [photo, setPhoto] = useState();
 
-    const [arr, setArr] = useState([])
+    //  словарь с base64 представлениями фотографий (словарь, чтобы хранить все фотки в нужном порядке)
+    const [arr2] = useState({}) // массив с base64 представлениями фотографий
 
-    useEffect(() => {
-        let index = 0;
+    // нужно, чтобы один раз загрузить
+    // не использовал useEffect тк он ругается на отсутствие зависимостей
+    // получаем картинки для мини проекта
+    const [load, setLoad] = useState(true);
 
-
-
+    if (load) {
+        console.log(234234)
         for (let i = 0; i < project.preview.length; i++) {
             const image = {
                 title: project.name,
                 name: project.preview[i],
             }
-            arr.push(axios.get(`/image/${image.title}/${image.name}`, image).then(res => {
-                // console.log(res)
-                // setCurrentPhoto(res.data)
-                // setImageUrl(res.data)
+            axios.get(`/image/${image.title}/${image.name}`, image).then(res => {
+                if (i === 0) setCurrentPhoto(res.data)
+                setPhoto(photo)
+                setPhoto(res.data)
+                arr2[i] = res.data;
                 return res.data
-            }))
-            // arr1[i] = arr[i]
+            })
         }
-
-        // устанавливаем базовое значение для проекта
-        arr[0].then( data => {
-            setCurrentPhoto(data)
-            // console.log(data)
-        })
-
-
-        console.log(arr)
-
-
-    }, [])
+        setLoad(false)
+    }
 
     // метод изменения фотографии сзади при ведении мышкой
     const setBackgroundPhoto = (id) => {
-        // const imageUrl1 = require(`../../../image/gallery/${project.preview[id]}`);
-        // // console.log(imageUrls)
-        // setCurrentPhoto(imageUrl1);
-        arr[id].then( data => {
-            setCurrentPhoto(data)
-            // console.log(data)
-        })
+        // arr[id].then( data => {
+        //     setCurrentPhoto(data)
+        // })
+        setCurrentPhoto(arr2[id])
     }
 
 
@@ -80,15 +72,19 @@ export const MiniProject = ({custom, project}) => {
     return (
         <motion.div initial="hidden" whileInView="visible" custom={2} viewport={{amount: 0, once: true}}
                     variants={animation} className={st.frame}
-                    onMouseLeave={() => setCurrentPhoto(arr[0].then( data => setCurrentPhoto(data)))}>
+                    onMouseLeave={() => setCurrentPhoto(arr2[0])}>
             <Link to={`/admin/${project._id}`}>
                 <div className={st.project}>
-                    <img src={currentPhoto} alt={"miniPhoto"} className={st.projectPhoto}/>
-                    <span>{project.name}</span>
+                    {currentPhoto ?
+                        <>
+                            <img src={currentPhoto} alt={"miniPhoto"} className={st.projectPhoto}/>
+                            <span>{project.name}</span>
+                        </>
+                        :
+                        <Loader width={60}/>
+                    }
+
                 </div>
-                {/*<div className={st.project} style={{backgroundImage: `url(${currentPhoto})`, backgroundRepeat:"no-repeat"}} >*/}
-                {/*    <span>{project.name}</span>*/}
-                {/*</div>*/}
                 <div className={st.params}>
                     <div className={st.param}>
                         <Area width={21}/>
