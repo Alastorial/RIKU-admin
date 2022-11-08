@@ -5,6 +5,9 @@ import {Redirect, useParams} from "react-router-dom";
 import st from "./EditProject.module.css"
 import axios from "../../axios";
 import {useForm} from "react-hook-form";
+import Loader from "../../components/UI/Loader/Loader";
+import {ReactComponent as Close} from "../../image/icons/close.svg";
+
 
 export const Admin = () => {
     const isAuth = useSelector(selectIsAuth)
@@ -12,7 +15,14 @@ export const Admin = () => {
     const id = useParams().id;
     const [projectInfo, setProjectInfo] = useState({})
 
+    //  словарь с фотографиями (словарь, чтобы хранить все фотки в нужном порядке)
+    const [arr2, setArr2] = useState({}) // массив с base64 представлениями фотографий
 
+    // идет ли загрузка данных проекта
+    const [isLoading, setIsLoading] = useState(true);
+
+    // состояние для подгрузки очередной картинки
+    const [photo, setPhoto] = useState();
 
     const onClickLogout = () => {
         if (window.confirm('Вы действительно хотите выйти ?')) {
@@ -26,18 +36,7 @@ export const Admin = () => {
         console.log(data)
     }
 
-    const { register, handleSubmit, formState: {errors}, reset, setValue } = useForm({
-        // defaultValues: {
-        //     name: projectInfo.name,
-        //     description: projectInfo.description,
-        //     type: projectInfo.type,
-        //     address: projectInfo.address,
-        //     place: projectInfo.place,
-        //     numberOfRooms: projectInfo.numberOfRooms,
-        //     area: projectInfo.area,
-        //     popular: projectInfo.popular,
-        //     date: projectInfo.date
-        // },
+    const {register, handleSubmit, formState: {errors}, reset, setValue} = useForm({
         mode: "onBlur"
     })
 
@@ -45,18 +44,55 @@ export const Admin = () => {
     useEffect(() => {
         axios.get(`/projects/${id}`).then(res => {
             setProjectInfo(res.data)
-            setValue('name', res.data.name, { shouldValidate: true })
-            setValue('description', res.data.description, { shouldValidate: true })
-            setValue('type', res.data.type, { shouldValidate: true })
-            setValue('address', res.data.address, { shouldValidate: true })
-            setValue('place', res.data.place, { shouldValidate: true })
-            setValue('numberOfRooms', res.data.numberOfRooms, { shouldValidate: true })
-            setValue('area', res.data.area, { shouldValidate: true })
-            setValue('popular', res.data.popular, { shouldValidate: true })
+            setIsLoading(false)
+            for (let i = 0; i < res.data.photo.length; i++) {
+                const image = {
+                    title: res.data.name,
+                    name: res.data.photo[i],
+                }
+                axios.get(`/image/${image.title}/${image.name}`, image).then(res => {
+                    arr2[image.name] = res.data
+
+                    setPhoto(photo)
+                    setPhoto(res.data)
+
+
+                    return res.data
+                })
+            }
+            // console.log(arr2)
+            setValue('name', res.data.name, {shouldValidate: true})
+            setValue('description', res.data.description, {shouldValidate: true})
+            setValue('type', res.data.type, {shouldValidate: true})
+            setValue('address', res.data.address, {shouldValidate: true})
+            setValue('place', res.data.place, {shouldValidate: true})
+            setValue('numberOfRooms', res.data.numberOfRooms, {shouldValidate: true})
+            setValue('area', res.data.area, {shouldValidate: true})
+            setValue('popular', res.data.popular, {shouldValidate: true})
             let date = res.data.date.split(".").reverse().join('-');
-            setValue('date', date, { shouldValidate: true })
+            setValue('date', date, {shouldValidate: true})
         });
     }, [id])
+
+    // функция удаления названия фотографии из projectInfo и представления фотографии в base64 из arr2
+    const removePhoto = (e) => {
+        console.log(e.target.id)
+
+        if (projectInfo.photo.indexOf(e.target.id) >= 0) {
+            projectInfo.photo.splice(projectInfo.photo.indexOf(e.target.id), 1);
+            delete arr2[e.target.id]
+        }
+
+
+        console.log(projectInfo.photo)
+        console.log(arr2)
+        setProjectInfo({...projectInfo, photo: projectInfo.photo})
+        setArr2(arr2)
+    }
+
+    useEffect(() => {
+        console.log(projectInfo)
+    }, [projectInfo])
 
     return (
         <div>
@@ -76,6 +112,10 @@ export const Admin = () => {
                             }
                         })}
                     />
+                    <div className={st.inputErrorMessage}>
+                        {errors?.name && <p>{errors?.name?.message}</p>}
+                    </div>
+
                     <textarea
                         className={`${st.input} ${st.textArea}`}
                         placeholder={"Описание"}
@@ -87,73 +127,144 @@ export const Admin = () => {
                             }
                         })}
                     />
-                    <div className={st.tagsBlock}>
-                        <input
-                            className={`${st.input} ${st.inputTags}`}
-                            type={"text"}
-                            placeholder={"Адрес"}
-                            {...register("address", {
-                                required: "Укажите адрес проекта",
-                                minLength: {
-                                    value: 2,
-                                    message: "Минимум 2 символа"
-                                }
-                            })}
-                        />
-                        <input
-                            className={`${st.input} ${st.inputTags}`}
-                            type={"text"}
-                            placeholder={"Жилой комплекс"}
-                            {...register("place", {
-                                required: "Укажите ЖК проекта",
-                                minLength: {
-                                    value: 2,
-                                    message: "Минимум 2 символа"
-                                }
-                            })}
-                        />
-                        <input
-                            className={`${st.input} ${st.inputTags}`}
-                            type={"number"}
-                            placeholder={"Кол-во комнат"}
-                            {...register("numberOfRooms", {
-                                required: "Укажите кол-во комнат проекта",
-                                minLength: {
-                                    value: 1,
-                                    message: "Минимум 1 символ"
-                                }
-                            })}
-                        />
-                        <input
-                            className={`${st.input} ${st.inputTags}`}
-                            type={"number"}
-                            placeholder={"Площадь"}
-                            {...register("area", {
-                                required: "Укажите площадь проекта",
-                                minLength: {
-                                    value: 1,
-                                    message: "Минимум 1 символ"
-                                }
-                            })}
-                        />
-                        <input
-                            className={`${st.input} ${st.inputTags}`}
-                            type={"date"}
-                            placeholder={"Дата публикации"}
-                            {...register("date", {
-                                required: "Укажите дату публикации проекта",
-                                minLength: {
-                                    value: 1,
-                                    message: "Минимум 1 символ"
-                                }
-                            })}
-                        />
-                    </div>
-
-
                     <div className={st.inputErrorMessage}>
-                        {errors?.name && <p>{errors?.name?.message}</p>}
+                        {errors?.description && <p>{errors?.description?.message}</p>}
                     </div>
+                    <div className={st.tagsBlock}>
+                        <div className={st.inputBlock}>
+                            <input
+                                className={`${st.input} ${st.inputTags}`}
+                                type={"text"}
+                                placeholder={"Адрес"}
+                                {...register("address", {
+                                    required: "Укажите адрес проекта",
+                                    minLength: {
+                                        value: 2,
+                                        message: "Минимум 2 символа"
+                                    }
+                                })}
+                            />
+                            <div className={st.inputErrorMessage}>
+                                {errors?.address && <p>{errors?.address?.message}</p>}
+                            </div>
+                        </div>
+                        <div className={st.inputBlock}>
+                            <input
+                                className={`${st.input} ${st.inputTags}`}
+                                type={"text"}
+                                placeholder={"Жилой комплекс"}
+                                {...register("place", {
+                                    required: "Укажите ЖК проекта",
+                                    minLength: {
+                                        value: 2,
+                                        message: "Минимум 2 символа"
+                                    }
+                                })}
+                            />
+                            <div className={st.inputErrorMessage}>
+                                {errors?.place && <p>{errors?.place?.message}</p>}
+                            </div>
+                        </div>
+
+                        <div className={st.inputBlock}>
+                            <input
+                                className={`${st.input} ${st.inputTags}`}
+                                type={"number"}
+                                min={1}
+                                placeholder={"Кол-во комнат"}
+                                {...register("numberOfRooms", {
+                                    required: "Укажите кол-во комнат проекта",
+                                    minLength: {
+                                        value: 1,
+                                        message: "Минимум 1 символ"
+                                    }
+                                })}
+                            />
+                            <div className={st.inputErrorMessage}>
+                                {errors?.numberOfRooms && <p>{errors?.numberOfRooms?.message}</p>}
+                            </div>
+                        </div>
+
+                        <div className={st.inputBlock}>
+                            <input
+                                className={`${st.input} ${st.inputTags}`}
+                                type={"number"}
+                                min={1}
+                                placeholder={"Площадь"}
+                                {...register("area", {
+                                    required: "Укажите площадь проекта",
+                                    minLength: {
+                                        value: 1,
+                                        message: "Минимум 1 символ"
+                                    }
+                                })}
+                            />
+                            <div className={st.inputErrorMessage}>
+                                {errors?.area && <p>{errors?.area?.message}</p>}
+                            </div>
+                        </div>
+
+                        <div className={st.inputBlock}>
+                            <input
+                                className={`${st.input} ${st.inputTags}`}
+                                type={"date"}
+                                placeholder={"Дата публикации"}
+                                {...register("date", {
+                                    required: "Укажите дату публикации проекта",
+                                    minLength: {
+                                        value: 1,
+                                        message: "Минимум 1 символ"
+                                    }
+                                })}
+                            />
+                            <div className={st.inputErrorMessage}>
+                                {errors?.date && <p>{errors?.date?.message}</p>}
+                            </div>
+                        </div>
+
+                        <div className={st.inputBlock}>
+                            <select
+                                className={`${st.input} ${st.inputTags}`}
+                                placeholder={"Дата публикации"}
+                                {...register("type", {
+                                    required: "Укажите тип проекта",
+                                    minLength: {
+                                        value: 1,
+                                        message: "Минимум 1 символ"
+                                    }
+                                })}
+                            >
+                                <option value={"house"}>Дом</option>
+                                <option value={"flat"}>Квартира</option>
+                                <option value={"office"}>Офис</option>
+                            </select>
+                            <div className={st.inputErrorMessage}>
+                                {errors?.type && <p>{errors?.type?.message}</p>}
+                            </div>
+                        </div>
+
+                        {!isLoading && (
+                            <div className={st.gallery}>
+                                {projectInfo?.photo.map((p, id) =>
+                                    <div className={st.photoBlock} key={id}>
+                                        {arr2[p] ? (
+                                                <>
+                                                    <img className={st.photo} src={arr2[p]} alt={projectInfo.photo[id]}/>
+                                                    <Close className={st.closeButton} id={projectInfo.photo[id]} onClick={(e) => removePhoto(e)}/>
+                                                </>
+                                            ) :
+                                            (
+                                                <Loader width={40}/>
+                                            )}
+
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                    </div>
+
+
                 </form>
             </div>
         </div>
