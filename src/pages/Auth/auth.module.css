@@ -61,7 +61,12 @@
     transition: all 200ms ease-in;
 }
 
-.submitButton:hover {
+.submitButton:hover, .submitButton:active {
     background-color: #e9f4ff;
+    border: #c7e2ff 1px solid;
+}
+
+.submitButton:active {
+    background-color: #b1d5ff;
     border: #c7e2ff 1px solid;
 }

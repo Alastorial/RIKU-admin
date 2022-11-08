@@ -1,15 +1,17 @@
-import React from 'react';
+import React, {useState} from 'react';
 import st from "./auth.module.css"
 import {useForm} from "react-hook-form";
 import {useDispatch, useSelector} from "react-redux";
 import {fetchAuth, selectIsAuth} from "../../redux/slices/auth";
 import {Redirect} from "react-router-dom";
+import Loader from "../../components/UI/Loader/Loader";
 
 
 export const Auth = () => {
     const dispatch = useDispatch()
     const isAuth = useSelector(selectIsAuth)
-    console.log(isAuth)
+    const { auth } = useSelector(state => state.auth);  // вытаскиваем из store
+    const isLoading = auth.status === 'loading';
 
     const { register, handleSubmit, formState: {errors} } = useForm({
         defaultValues: {
@@ -21,6 +23,7 @@ export const Auth = () => {
 
     const onSubmit = async (value) => {
         const data = await dispatch(fetchAuth(value))
+        console.log(123)
         if (!data.payload) {
             return alert("Не удалось авторизоваться!")
         }
@@ -76,6 +79,7 @@ export const Auth = () => {
                         <button type={"submit"} className={st.submitButton}>Отправить</button>
                     </div>
                 </form>
+                <Loader style={{display: {isLoading}}}/>
             </div>
 
         </div>

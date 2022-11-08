@@ -3,7 +3,7 @@ import st from "./Loader.module.css";
 import {motion} from 'framer-motion';
 
 
-const Loader = ({width}) => {
+const Loader = ({width = 50}) => {
 
     // анимация
     const animation = {

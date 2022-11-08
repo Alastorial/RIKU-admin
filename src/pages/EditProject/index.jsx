@@ -32,8 +32,11 @@ export const Admin = () => {
         }
     };
 
-    const onSubmit = (data) => {
-        console.log(data)
+    const onSubmit = async (data) => {
+        console.log({...projectInfo, ...data, lastName: projectInfo.name})
+        const answer = await axios.patch(`projects/${id}`, {...projectInfo, ...data, lastName: projectInfo.name});
+        alert("success: " + answer.data.success);
+
     }
 
     const {register, handleSubmit, formState: {errors}, reset, setValue} = useForm({
@@ -55,7 +58,6 @@ export const Admin = () => {
 
                     setPhoto(photo)
                     setPhoto(res.data)
-
 
                     return res.data
                 })

@@ -21,8 +21,10 @@ export const fetchRegister = createAsyncThunk('auth/fetchAuth', async (params) =
 })
 
 const initialState = {
-    data: null,
-    status: 'loading'
+    auth: {
+        data: null,
+        status: 'loading'
+    }
 };
 
 const authSlice = createSlice({
@@ -48,7 +50,7 @@ const authSlice = createSlice({
         }, // действия относительно состояний загрузки данных
 
         [fetchAuthMe.pending]: (state) => {
-            state.status = 'loading'
+            state.status = 'autoLoading'
             state.data = null
         },
         [fetchAuthMe.fulfilled]: (state, action) => {
