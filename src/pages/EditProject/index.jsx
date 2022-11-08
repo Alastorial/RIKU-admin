@@ -58,6 +58,7 @@ export const Admin = () => {
         await axios.post(`/image/${projectInfo.name}`, formData)
         // console.log({...projectInfo, ...data, lastName: projectInfo.name})
         const answer = await axios.patch(`projects/${id}`, {...projectInfo, ...data, lastName: projectInfo.name});
+        projectInfo.name = data.name;
         alert("success: " + answer.data.success);
     }
 
