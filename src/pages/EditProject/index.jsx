@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import {logout, selectIsAuth} from "../../redux/slices/auth";
 import {Redirect, useParams} from "react-router-dom";
@@ -24,6 +24,8 @@ export const Admin = () => {
     // состояние для подгрузки очередной картинки
     const [photo, setPhoto] = useState();
 
+    const inputFileRef = useRef(null); // сюда мы привяжем поле для загрузки картинок
+
     const onClickLogout = () => {
         if (window.confirm('Вы действительно хотите выйти ?')) {
             dispatch(logout()); // это делается именно так тк данные о пользователе хранятся в store, поэтому
@@ -33,10 +35,30 @@ export const Admin = () => {
     };
 
     const onSubmit = async (data) => {
-        console.log({...projectInfo, ...data, lastName: projectInfo.name})
+        const formData = new FormData(); // это спец формат для вшития картинки и отправки ее на бэк
+
+
+        const files = inputFileRef.current.files;
+        for (let key of Object.keys(files)) {
+            formData.append('postImage', files[key])
+            if (projectInfo.photo.indexOf(files[key].name) === -1) {
+                projectInfo.photo.push(files[key].name)
+            }
+            console.log(projectInfo.photo);
+            // console.log(files[key]);
+        }
+
+
+
+
+        // const file = inputFileRef.current.files[0];
+        // formData.append('postImage', file)
+        // console.log(inputFileRef.current.files)
+        // const { data2 }  = await axios.post('/image', {title: projectInfo.name, formData}, config)
+        await axios.post(`/image/${projectInfo.name}`, formData)
+        // console.log({...projectInfo, ...data, lastName: projectInfo.name})
         const answer = await axios.patch(`projects/${id}`, {...projectInfo, ...data, lastName: projectInfo.name});
         alert("success: " + answer.data.success);
-
     }
 
     const {register, handleSubmit, formState: {errors}, reset, setValue} = useForm({
@@ -89,6 +111,7 @@ export const Admin = () => {
         setArr2(arr2)
     }
 
+
     useEffect(() => {
         console.log(projectInfo)
     }, [projectInfo])
@@ -98,7 +121,7 @@ export const Admin = () => {
             <button onClick={onClickLogout}>Выйти</button>
             <div className={st.container}>
                 <span className={st.title}>Редактор проекта</span>
-                <form onSubmit={handleSubmit(onSubmit)}>
+                <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
                     <input
                         className={st.input}
                         type={"text"}
@@ -241,6 +264,9 @@ export const Admin = () => {
                                 {errors?.type && <p>{errors?.type?.message}</p>}
                             </div>
                         </div>
+                        {/*<form encType="multipart/form-data" method="post">*/}
+                            <input ref={inputFileRef} type={"file"} multiple name={"imagesArray"} accept="image/jpeg,image/png,image/jpg, image/heic, image/HEIC"/>
+                        {/*</form>*/}
 
                     </div>
 
@@ -252,6 +278,8 @@ export const Admin = () => {
                                             <>
                                                 <img className={st.photo} src={arr2[p]} alt={projectInfo.photo[id]}/>
                                                 <Close className={st.closeButton} id={projectInfo.photo[id]} onClick={(e) => removePhoto(e)}/>
+                                                <span className={st.fileName}>{projectInfo.photo[id]}</span>
+
                                             </>
                                         ) :
                                         (
