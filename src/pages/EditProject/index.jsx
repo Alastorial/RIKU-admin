@@ -77,13 +77,10 @@ export const Admin = () => {
     // функция удаления названия фотографии из projectInfo и представления фотографии в base64 из arr2
     const removePhoto = (e) => {
         console.log(e.target.id)
-
         if (projectInfo.photo.indexOf(e.target.id) >= 0) {
             projectInfo.photo.splice(projectInfo.photo.indexOf(e.target.id), 1);
             delete arr2[e.target.id]
         }
-
-
         console.log(projectInfo.photo)
         console.log(arr2)
         setProjectInfo({...projectInfo, photo: projectInfo.photo})
@@ -243,29 +240,32 @@ export const Admin = () => {
                             </div>
                         </div>
 
-                        {!isLoading && (
-                            <div className={st.gallery}>
-                                {projectInfo?.photo.map((p, id) =>
-                                    <div className={st.photoBlock} key={id}>
-                                        {arr2[p] ? (
-                                                <>
-                                                    <img className={st.photo} src={arr2[p]} alt={projectInfo.photo[id]}/>
-                                                    <Close className={st.closeButton} id={projectInfo.photo[id]} onClick={(e) => removePhoto(e)}/>
-                                                </>
-                                            ) :
-                                            (
-                                                <Loader width={40}/>
-                                            )}
-
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
                     </div>
 
+                    {!isLoading && (
+                        <div className={st.gallery}>
+                            {projectInfo?.photo.map((p, id) =>
+                                <div className={st.photoBlock} key={id}>
+                                    {arr2[p] ? (
+                                            <>
+                                                <img className={st.photo} src={arr2[p]} alt={projectInfo.photo[id]}/>
+                                                <Close className={st.closeButton} id={projectInfo.photo[id]} onClick={(e) => removePhoto(e)}/>
+                                            </>
+                                        ) :
+                                        (
+                                            <Loader width={40}/>
+                                        )}
+
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    <button>Обновить</button>
 
                 </form>
+
+
             </div>
         </div>
     );
