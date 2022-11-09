@@ -1,7 +1,7 @@
 .container {
     margin: 0 auto;
     padding: 0 20px;
-    max-width: 1440px;
+    max-width: 1220px;
     font-family: "Noah Head", sans-serif;
     font-size: 16px;
 }
@@ -61,6 +61,7 @@
     display: flex;
     width: 100%;
     flex-wrap: wrap;
+    justify-content: space-between;
     align-items: center;
 }
 
@@ -81,9 +82,62 @@
 
 .closeButton {
     position: absolute;
-    right: 5px;
-    top: 5px;
+    background-color: white;
+    border-radius: 5px;
+    z-index: 3;
+    right: 3px;
+    top: 3px;
     cursor: pointer;
+}
+
+.chevronLeft {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+}
+
+.chevronLeftBlock {
+    z-index: 2;
+    cursor: pointer;
+    position: absolute;
+    height: 100%;
+    top: 0;
+    left: 0;
+    width: 15%;
+    background-color: transparent;
+    transition: all 300ms ease-in-out;
+}
+
+.chevronLeftBlock:hover {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.chevronRight {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+}
+
+.chevronRightBlock {
+    z-index: 2;
+    cursor: pointer;
+    position: absolute;
+    height: 100%;
+    top: 0;
+    right: 0;
+    width: 15%;
+    background-color: transparent;
+    transition: all 300ms ease-in-out;
+}
+
+.chevronRightBlock:hover {
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
 .fileName {

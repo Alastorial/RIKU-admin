@@ -7,6 +7,9 @@ import axios from "../../axios";
 import {useForm} from "react-hook-form";
 import Loader from "../../components/UI/Loader/Loader";
 import {ReactComponent as Close} from "../../image/icons/close.svg";
+import {ReactComponent as ChevronLeft} from "../../image/icons/chevron-left.svg";
+import {ReactComponent as ChevronRight} from "../../image/icons/chevron-right.svg";
+import {translate} from "../../utils/Utils";
 
 
 export const Admin = () => {
@@ -16,7 +19,7 @@ export const Admin = () => {
     const [projectInfo, setProjectInfo] = useState({})
 
     //  словарь с фотографиями (словарь, чтобы хранить все фотки в нужном порядке)
-    const [arr2, setArr2] = useState({}) // массив с base64 представлениями фотографий
+    const [arr, setArr] = useState({}) // массив с base64 представлениями фотографий
 
     // идет ли загрузка данных проекта
     const [isLoading, setIsLoading] = useState(true);
@@ -24,50 +27,11 @@ export const Admin = () => {
     // состояние для подгрузки очередной картинки
     const [photo, setPhoto] = useState();
 
+    // массив с загруженными админом фотографиями
+    const [newPhoto, setNewPhoto] = useState([]);
+
     const inputFileRef = useRef(null); // сюда мы привяжем поле для загрузки картинок
 
-    const onClickLogout = () => {
-        if (window.confirm('Вы действительно хотите выйти ?')) {
-            dispatch(logout()); // это делается именно так тк данные о пользователе хранятся в store, поэтому
-            // logout находится именно там, мы его оттуда импортируем
-            window.localStorage.removeItem('token')
-        }
-    };
-
-    const onSubmit = async (data) => {
-        const formData = new FormData(); // это спец формат для вшития картинки и отправки ее на бэк
-
-
-        const files = inputFileRef.current.files;
-        for (let key of Object.keys(files)) {
-            formData.append('postImage', files[key])
-            if (projectInfo.photo.indexOf(files[key].name) === -1) {
-                projectInfo.photo.push(files[key].name)
-            }
-            console.log(projectInfo.photo);
-            // console.log(files[key]);
-        }
-
-
-
-
-        // const file = inputFileRef.current.files[0];
-        // formData.append('postImage', file)
-        // console.log(inputFileRef.current.files)
-        // const { data2 }  = await axios.post('/image', {title: projectInfo.name, formData}, config)
-        await axios.post(`/image/${projectInfo.name}`, formData)
-        // console.log({...projectInfo, ...data, lastName: projectInfo.name})
-        const answer = await axios.patch(`projects/${id}`, {...projectInfo, ...data, lastName: projectInfo.name});
-        projectInfo.name = data.name;
-        alert("success: " + answer.data.success);
-        window.location.reload();
-    }
-
-    const {register, handleSubmit, formState: {errors}, reset, setValue} = useForm({
-        mode: "onBlur"
-    })
-
-    // этот проект мы получаем с сервера
     useEffect(() => {
         axios.get(`/projects/${id}`).then(res => {
             setProjectInfo(res.data)
@@ -78,7 +42,7 @@ export const Admin = () => {
                     name: res.data.photo[i],
                 }
                 axios.get(`/image/${image.title}/${image.name}`, image).then(res => {
-                    arr2[image.name] = res.data
+                    arr[image.name] = res.data
                     // console.log(res.data)
 
                     setPhoto(photo)
@@ -87,7 +51,7 @@ export const Admin = () => {
                     return res.data
                 })
             }
-            // console.log(arr2)
+            // устанавливаем значения в поля формы
             setValue('name', res.data.name, {shouldValidate: true})
             setValue('description', res.data.description, {shouldValidate: true})
             setValue('type', res.data.type, {shouldValidate: true})
@@ -101,22 +65,90 @@ export const Admin = () => {
         });
     }, [id])
 
-    // функция удаления названия фотографии из projectInfo и представления фотографии в base64 из arr2
-    const removePhoto = (e) => {
-        console.log(e.target.id)
-        if (projectInfo.photo.indexOf(e.target.id) >= 0) {
-            projectInfo.photo.splice(projectInfo.photo.indexOf(e.target.id), 1);
-            delete arr2[e.target.id]
+
+
+    const onClickLogout = () => {
+        if (window.confirm('Вы действительно хотите выйти ?')) {
+            dispatch(logout()); // это делается именно так тк данные о пользователе хранятся в store, поэтому
+            // logout находится именно там, мы его оттуда импортируем
+            window.localStorage.removeItem('token')
         }
-        console.log(projectInfo.photo)
-        console.log(arr2)
+    };
+
+    const onSubmit = async (data) => {
+        const formData = new FormData(); // это спец формат для вшития картинки и отправки ее на бэк
+        // получаем загруженные файлы
+        const files = inputFileRef.current.files;
+        //добавляем их в formData
+        for (let key of Object.keys(files)) {
+            const newFile = new File([files[key]], translate(files[key].name));
+            // files[key].name = translate(files[key].name)
+            formData.append('postImage', newFile)
+            // защита, чтобы не добавить дважды
+            if (projectInfo.photo.indexOf(newFile.name) === -1) {
+                projectInfo.photo.push(newFile.name)
+            }
+            console.log(projectInfo.photo);
+        }
+
+        // загружаем фотографии на бэк
+        await axios.post(`/image/${projectInfo.name}`, formData)
+
+        // обновляем данные в монгоДБ
+        const answer = await axios.patch(`projects/${id}`, {...projectInfo, ...data, lastName: projectInfo.name});
+        projectInfo.name = data.name;
+        alert("success: " + answer.data.success);
+        window.location.reload();
+    }
+
+    const {register, handleSubmit, formState: {errors}, reset, setValue} = useForm({mode: "onBlur"})
+
+    // функция удаления названия фотографии из projectInfo и представления фотографии в base64 из arr
+    const removePhoto = (photo) => {
+        // console.log(photo)
+        if (projectInfo.photo.indexOf(photo) >= 0) {
+            projectInfo.photo.splice(projectInfo.photo.indexOf(photo), 1);
+            delete arr[photo]
+        }
+        // console.log(projectInfo.photo)
+        // console.log(arr)
         setProjectInfo({...projectInfo, photo: projectInfo.photo})
-        setArr2(arr2)
+        setArr(arr)
+    }
+
+    const removeNewPhoto = (photo) => {
+        if (newPhoto.indexOf(photo) >= 0) {
+            newPhoto.splice(newPhoto.indexOf(photo), 1);
+        }
+        console.log(newPhoto)
+        setNewPhoto(newPhoto)
+    }
+
+    const moveProjectPhoto = (s, photo) => {
+        const indexPhotoInProjectInfo = projectInfo.photo.indexOf(photo);
+        // console.log(s)
+        if (s === "right" && projectInfo.photo.length - 1 > indexPhotoInProjectInfo) {
+            const buffer = projectInfo.photo[indexPhotoInProjectInfo + 1];
+            projectInfo.photo[indexPhotoInProjectInfo + 1] = projectInfo.photo[indexPhotoInProjectInfo];
+            projectInfo.photo[indexPhotoInProjectInfo] = buffer;
+        }
+        if (s === "left" && indexPhotoInProjectInfo > 0) {
+            const buffer = projectInfo.photo[indexPhotoInProjectInfo - 1];
+            projectInfo.photo[indexPhotoInProjectInfo - 1] = projectInfo.photo[indexPhotoInProjectInfo];
+            projectInfo.photo[indexPhotoInProjectInfo] = buffer;
+        }
+
+        setProjectInfo({...projectInfo, photo: projectInfo.photo})
+    }
+
+    const loadNewPhoto = () => {
+        setNewPhoto(inputFileRef.current.files)
+        console.log(inputFileRef.current.files[0])
     }
 
 
     useEffect(() => {
-        console.log(projectInfo)
+        // console.log(projectInfo)
     }, [projectInfo])
 
     return (
@@ -268,19 +300,41 @@ export const Admin = () => {
                             </div>
                         </div>
                         {/*<form encType="multipart/form-data" method="post">*/}
-                            <input ref={inputFileRef} type={"file"} multiple name={"imagesArray"} accept="image/jpeg,image/png,image/jpg, image/heic, image/HEIC"/>
+                            <input ref={inputFileRef} type={"file"} onChange={loadNewPhoto} multiple name={"imagesArray"} accept="image/jpeg,image/png,image/jpg, image/heic, image/HEIC"/>
                         {/*</form>*/}
 
                     </div>
 
+                    {newPhoto.length !== 0 && (
+                        <div className={st.gallery}>
+                            {/* идем по названиям фотографий в данных о проекте с сервера */}
+                            {[...Array(newPhoto.length)].map((s, id) =>
+                                <div className={st.photoBlock} key={id}>
+                                    <img className={st.photo} src={newPhoto[id]} alt={newPhoto[id].name}/>
+                                    <Close className={st.closeButton} id={newPhoto[id]} onClick={() => removeNewPhoto(newPhoto[id])}/>
+                                    {/*<ChevronLeft className={st.chevronLeft}/>*/}
+                                    {/*<div className={st.chevronLeftBlock} onClick={() => moveProjectPhoto('left', p)}></div>*/}
+                                    {/*<ChevronRight className={st.chevronRight}/>*/}
+                                    {/*<div className={st.chevronRightBlock} onClick={() => moveProjectPhoto('right', p)}></div>*/}
+                                    <span className={st.fileName}>{newPhoto[id].name}</span>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     {!isLoading && (
                         <div className={st.gallery}>
+                            {/* идем по названиям фотографий в данных о проекте с сервера */}
                             {projectInfo?.photo.map((p, id) =>
                                 <div className={st.photoBlock} key={id}>
-                                    {arr2[p] ? (
+                                    {arr[p] ? (
                                             <>
-                                                <img className={st.photo} src={arr2[p]} alt={projectInfo.photo[id]}/>
-                                                <Close className={st.closeButton} id={projectInfo.photo[id]} onClick={(e) => removePhoto(e)}/>
+                                                <img className={st.photo} src={arr[p]} alt={projectInfo.photo[id]}/>
+                                                <Close className={st.closeButton} id={p} onClick={() => removePhoto(p)}/>
+                                                <ChevronLeft className={st.chevronLeft}/>
+                                                <div className={st.chevronLeftBlock} onClick={() => moveProjectPhoto('left', p)}></div>
+                                                <ChevronRight className={st.chevronRight}/>
+                                                <div className={st.chevronRightBlock} onClick={() => moveProjectPhoto('right', p)}></div>
                                                 <span className={st.fileName}>{projectInfo.photo[id]}</span>
 
                                             </>
