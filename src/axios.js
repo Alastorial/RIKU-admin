@@ -3,8 +3,8 @@ import axios from "axios";
 
 
 const instance = axios.create({
-    // baseURL: 'http://localhost:3002'
-    baseURL: 'https://riku-backend.herokuapp.com'
+    baseURL: 'http://localhost:3002'
+    // baseURL: 'https://riku-backend.herokuapp.com'
 })
 
 // вшили токен в каждый запрос на сервер

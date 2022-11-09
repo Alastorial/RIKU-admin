@@ -60,6 +60,7 @@ export const Admin = () => {
         const answer = await axios.patch(`projects/${id}`, {...projectInfo, ...data, lastName: projectInfo.name});
         projectInfo.name = data.name;
         alert("success: " + answer.data.success);
+        window.location.reload();
     }
 
     const {register, handleSubmit, formState: {errors}, reset, setValue} = useForm({
@@ -78,6 +79,7 @@ export const Admin = () => {
                 }
                 axios.get(`/image/${image.title}/${image.name}`, image).then(res => {
                     arr2[image.name] = res.data
+                    // console.log(res.data)
 
                     setPhoto(photo)
                     setPhoto(res.data)
