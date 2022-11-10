@@ -23,7 +23,7 @@ export const fetchRegister = createAsyncThunk('auth/fetchAuth', async (params) =
 const initialState = {
     auth: {
         data: null,
-        status: 'loading'
+        status: 'none'
     }
 };
 

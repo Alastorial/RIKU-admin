@@ -30,6 +30,8 @@ export const Admin = () => {
     // массив с загруженными админом фотографиями
     const [newPhoto, setNewPhoto] = useState([]);
 
+    const [newPhotoBase64, setNewPhotoBase64] = useState([]);
+
     const inputFileRef = useRef(null); // сюда мы привяжем поле для загрузки картинок
 
     useEffect(() => {
@@ -88,7 +90,7 @@ export const Admin = () => {
             if (projectInfo.photo.indexOf(newFile.name) === -1) {
                 projectInfo.photo.push(newFile.name)
             }
-            console.log(projectInfo.photo);
+            // console.log(projectInfo.photo);
         }
 
         // загружаем фотографии на бэк
@@ -117,10 +119,17 @@ export const Admin = () => {
     }
 
     const removeNewPhoto = (photo) => {
-        if (newPhoto.indexOf(photo) >= 0) {
-            newPhoto.splice(newPhoto.indexOf(photo), 1);
-        }
         console.log(newPhoto)
+        for (var i = 0; i < newPhoto.length; i++) {
+            if (newPhoto.item(i) === photo) {
+                break;
+            }
+            if (i === newPhoto.length - 1) return;
+        }
+
+        // if (newPhoto.indexOf(photo) >= 0) {
+            newPhoto.splice(newPhoto.item(i), 1);
+        // }
         setNewPhoto(newPhoto)
     }
 
@@ -141,9 +150,62 @@ export const Admin = () => {
         setProjectInfo({...projectInfo, photo: projectInfo.photo})
     }
 
-    const loadNewPhoto = () => {
+    useEffect(() => {
+        console.log(newPhotoBase64.length)
+    }, [newPhotoBase64])
+
+    // const loadNewPhoto = () => {
+    //     setNewPhoto([]);
+    //
+    //     newPhotoBase64.length = 0
+    //     setNewPhotoBase64(newPhotoBase64)
+    //
+    //     setNewPhotoBase64([]);
+    //
+    //
+    //     var fileReader = new FileReader();
+    //     fileReader.onload = function () {
+    //         newPhotoBase64.push(fileReader.result);
+    //         console.log(fileReader.result)
+    //         // setNewPhotoBase64(fileReader.result);
+    //         setNewPhotoBase64(newPhotoBase64);
+    //         // console.log(newPhotoBase64.length)
+    //         // console.log(newPhotoBase64)
+    //     }
+    //     fileReader.readAsDataURL(inputFileRef.current.files[i]);
+    //
+    //
+    //     // сохраняем все объекты типа File
+    //     setNewPhoto(inputFileRef.current.files)
+    // }
+
+    function loadNewPhoto() {
+        newPhotoBase64.length = 0
+        setNewPhotoBase64(newPhotoBase64)
+
+        var files = inputFileRef.current.files;
+
+        function readAndPreview(file) {
+            // console.log(file)
+
+            var reader = new FileReader();
+
+            reader.addEventListener("load", function () {
+                newPhotoBase64.push(this.result);
+                setNewPhotoBase64([...newPhotoBase64]);
+            });
+
+            reader.readAsDataURL(file);
+
+
+        }
+
+        if (files) {
+            for (let i = 0; i < files.length; i++)
+            readAndPreview(files[i]);
+        }
         setNewPhoto(inputFileRef.current.files)
-        console.log(inputFileRef.current.files[0])
+
     }
 
 
@@ -305,13 +367,13 @@ export const Admin = () => {
 
                     </div>
 
-                    {newPhoto.length !== 0 && (
+                    {(newPhoto.length !== 0 && newPhotoBase64.length !== 0) && (
                         <div className={st.gallery}>
                             {/* идем по названиям фотографий в данных о проекте с сервера */}
                             {[...Array(newPhoto.length)].map((s, id) =>
-                                <div className={st.photoBlock} key={id}>
-                                    <img className={st.photo} src={newPhoto[id]} alt={newPhoto[id].name}/>
-                                    <Close className={st.closeButton} id={newPhoto[id]} onClick={() => removeNewPhoto(newPhoto[id])}/>
+                                <div className={`${st.photoBlock} ${st.newPhotoBlock}`} key={id}>
+                                    <img className={st.photo} src={newPhotoBase64[id]} alt={newPhoto[id].name}/>
+                                    {/*<Close className={st.closeButton} id={newPhoto[id]} onClick={() => removeNewPhoto(newPhoto[id])}/>*/}
                                     {/*<ChevronLeft className={st.chevronLeft}/>*/}
                                     {/*<div className={st.chevronLeftBlock} onClick={() => moveProjectPhoto('left', p)}></div>*/}
                                     {/*<ChevronRight className={st.chevronRight}/>*/}

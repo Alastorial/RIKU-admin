@@ -11,7 +11,8 @@ export const Auth = () => {
     const dispatch = useDispatch()
     const isAuth = useSelector(selectIsAuth)
     const { auth } = useSelector(state => state.auth);  // вытаскиваем из store
-    const isLoading = auth.status === 'loading';
+    const isLoading = (auth.status === 'loading' ? "block" : "none");
+    console.log(auth.status)
 
     const { register, handleSubmit, formState: {errors} } = useForm({
         defaultValues: {
@@ -79,7 +80,7 @@ export const Auth = () => {
                         <button type={"submit"} className={st.submitButton}>Отправить</button>
                     </div>
                 </form>
-                <Loader style={{display: {isLoading}}}/>
+                <Loader display={isLoading}/>
             </div>
 
         </div>

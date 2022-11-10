@@ -27,7 +27,7 @@ export const MiniProject = ({project}) => {
     const [load, setLoad] = useState(true);
 
     if (load) {
-        console.log(234234)
+        // console.log(234234)
         for (let i = 0; i < project.preview.length; i++) {
             const image = {
                 title: project.name,
