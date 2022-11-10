@@ -12,7 +12,6 @@ export const Auth = () => {
     const isAuth = useSelector(selectIsAuth)
     const { auth } = useSelector(state => state.auth);  // вытаскиваем из store
     const isLoading = (auth.status === 'loading' ? "block" : "none");
-    console.log(auth.status)
 
     const { register, handleSubmit, formState: {errors} } = useForm({
         defaultValues: {

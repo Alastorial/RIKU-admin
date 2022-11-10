@@ -392,6 +392,7 @@ export const Admin = () => {
                                     {arr[p] ? (
                                             <>
                                                 <img className={st.photo} src={arr[p]} alt={projectInfo.photo[id]}/>
+                                                <input type={"checkbox"} className={st.checkBox} checked={projectInfo.preview.indexOf(p) >= 0}/>
                                                 <Close className={st.closeButton} id={p} onClick={() => removePhoto(p)}/>
                                                 <ChevronLeft className={st.chevronLeft}/>
                                                 <div className={st.chevronLeftBlock} onClick={() => moveProjectPhoto('left', p)}></div>
