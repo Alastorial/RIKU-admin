@@ -94,6 +94,12 @@
     left: 3px;
 }
 
+.previewNum {
+    position: absolute;
+    top: 3px;
+    left: 27px;
+}
+
 .closeButton {
     position: absolute;
     background-color: white;
@@ -158,4 +164,15 @@
     position: absolute;
     left: 0;
     bottom: 0;
+}
+
+.updateButton {
+    cursor: pointer;
+    background-color: #abd5ff;
+    border: none;
+    padding: 7px 15px;
+    border-radius: 6px;
+    color: black;
+    font-size: 16px;
+    margin: 20px auto;
 }

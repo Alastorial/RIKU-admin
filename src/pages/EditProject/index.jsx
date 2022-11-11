@@ -67,8 +67,6 @@ export const Admin = () => {
         });
     }, [id])
 
-
-
     const onClickLogout = () => {
         if (window.confirm('Вы действительно хотите выйти ?')) {
             dispatch(logout()); // это делается именно так тк данные о пользователе хранятся в store, поэтому
@@ -79,8 +77,10 @@ export const Admin = () => {
 
     const onSubmit = async (data) => {
         const formData = new FormData(); // это спец формат для вшития картинки и отправки ее на бэк
+
         // получаем загруженные файлы
         const files = inputFileRef.current.files;
+
         //добавляем их в formData
         for (let key of Object.keys(files)) {
             const newFile = new File([files[key]], translate(files[key].name));
@@ -90,9 +90,7 @@ export const Admin = () => {
             if (projectInfo.photo.indexOf(newFile.name) === -1) {
                 projectInfo.photo.push(newFile.name)
             }
-            // console.log(projectInfo.photo);
         }
-
         // загружаем фотографии на бэк
         await axios.post(`/image/${projectInfo.name}`, formData)
 
@@ -118,21 +116,6 @@ export const Admin = () => {
         setArr(arr)
     }
 
-    const removeNewPhoto = (photo) => {
-        console.log(newPhoto)
-        for (var i = 0; i < newPhoto.length; i++) {
-            if (newPhoto.item(i) === photo) {
-                break;
-            }
-            if (i === newPhoto.length - 1) return;
-        }
-
-        // if (newPhoto.indexOf(photo) >= 0) {
-            newPhoto.splice(newPhoto.item(i), 1);
-        // }
-        setNewPhoto(newPhoto)
-    }
-
     const moveProjectPhoto = (s, photo) => {
         const indexPhotoInProjectInfo = projectInfo.photo.indexOf(photo);
         // console.log(s)
@@ -151,33 +134,8 @@ export const Admin = () => {
     }
 
     useEffect(() => {
-        console.log(newPhotoBase64.length)
-    }, [newPhotoBase64])
-
-    // const loadNewPhoto = () => {
-    //     setNewPhoto([]);
-    //
-    //     newPhotoBase64.length = 0
-    //     setNewPhotoBase64(newPhotoBase64)
-    //
-    //     setNewPhotoBase64([]);
-    //
-    //
-    //     var fileReader = new FileReader();
-    //     fileReader.onload = function () {
-    //         newPhotoBase64.push(fileReader.result);
-    //         console.log(fileReader.result)
-    //         // setNewPhotoBase64(fileReader.result);
-    //         setNewPhotoBase64(newPhotoBase64);
-    //         // console.log(newPhotoBase64.length)
-    //         // console.log(newPhotoBase64)
-    //     }
-    //     fileReader.readAsDataURL(inputFileRef.current.files[i]);
-    //
-    //
-    //     // сохраняем все объекты типа File
-    //     setNewPhoto(inputFileRef.current.files)
-    // }
+        console.log(projectInfo.preview)
+    }, [projectInfo])
 
     function loadNewPhoto() {
         newPhotoBase64.length = 0
@@ -206,6 +164,15 @@ export const Admin = () => {
         }
         setNewPhoto(inputFileRef.current.files)
 
+    }
+
+    const setPreview = (photo) => {
+        if (projectInfo.preview.indexOf(photo) >= 0) {
+            projectInfo.preview.splice(projectInfo.preview.indexOf(photo), 1);
+        } else {
+            projectInfo.preview.push(photo);
+        }
+        setProjectInfo({...projectInfo, preview: projectInfo.preview})
     }
 
 
@@ -373,11 +340,6 @@ export const Admin = () => {
                             {[...Array(newPhoto.length)].map((s, id) =>
                                 <div className={`${st.photoBlock} ${st.newPhotoBlock}`} key={id}>
                                     <img className={st.photo} src={newPhotoBase64[id]} alt={newPhoto[id].name}/>
-                                    {/*<Close className={st.closeButton} id={newPhoto[id]} onClick={() => removeNewPhoto(newPhoto[id])}/>*/}
-                                    {/*<ChevronLeft className={st.chevronLeft}/>*/}
-                                    {/*<div className={st.chevronLeftBlock} onClick={() => moveProjectPhoto('left', p)}></div>*/}
-                                    {/*<ChevronRight className={st.chevronRight}/>*/}
-                                    {/*<div className={st.chevronRightBlock} onClick={() => moveProjectPhoto('right', p)}></div>*/}
                                     <span className={st.fileName}>{newPhoto[id].name}</span>
                                 </div>
                             )}
@@ -392,7 +354,8 @@ export const Admin = () => {
                                     {arr[p] ? (
                                             <>
                                                 <img className={st.photo} src={arr[p]} alt={projectInfo.photo[id]}/>
-                                                <input type={"checkbox"} className={st.checkBox} checked={projectInfo.preview.indexOf(p) >= 0}/>
+                                                <input type={"checkbox"} className={st.checkBox} onChange={() => setPreview(p)} checked={projectInfo.preview.indexOf(p) >= 0}/>
+                                                <p className={st.previewNum}>{projectInfo.preview.indexOf(p) >= 0 && projectInfo.preview.indexOf(p) + 1}</p>
                                                 <Close className={st.closeButton} id={p} onClick={() => removePhoto(p)}/>
                                                 <ChevronLeft className={st.chevronLeft}/>
                                                 <div className={st.chevronLeftBlock} onClick={() => moveProjectPhoto('left', p)}></div>
@@ -411,7 +374,7 @@ export const Admin = () => {
                         </div>
                     )}
 
-                    <button>Обновить</button>
+                    <button className={st.updateButton}>Обновить</button>
 
                 </form>
 

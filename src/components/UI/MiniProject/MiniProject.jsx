@@ -46,9 +46,6 @@ export const MiniProject = ({project}) => {
 
     // метод изменения фотографии сзади при ведении мышкой
     const setBackgroundPhoto = (id) => {
-        // arr[id].then( data => {
-        //     setCurrentPhoto(data)
-        // })
         setCurrentPhoto(arr2[id])
     }
 
