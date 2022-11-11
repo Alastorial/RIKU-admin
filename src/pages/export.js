@@ -1,2 +1,2 @@
 export { Auth } from "./Auth"
-export { Admin }  from "./EditProject"
+export { EditProject }  from "./EditProject"

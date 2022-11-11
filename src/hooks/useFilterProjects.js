@@ -83,6 +83,5 @@ export const useFilterProjects = (projectsInfo, filters) => {
     newProjectsInfo = sortBySort(newProjectsInfo, filters);
 
 
-    // console.log(newProjectsInfo)
     return newProjectsInfo;
 }

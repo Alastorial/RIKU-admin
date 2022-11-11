@@ -99,7 +99,7 @@ const Filter = ({ filters, setFilters, projectsInfo }) => {
                         </div>
                         <div className={st.slider}>
                             <Typography id="slider" gutterBottom>
-                                {filters["sMin"] === 1 && filters["sMax"] === 200 ?
+                                {filters["sMin"] === 1 && filters["sMax"] === 300 ?
                                     "Площадь: любая"
                                     : "Площадь: от " + filters["sMin"] + ' м² до ' + filters["sMax"] + " м²"
 
@@ -117,7 +117,7 @@ const Filter = ({ filters, setFilters, projectsInfo }) => {
                                     onChange={updateFilter}
                                     // valueLabelDisplay="auto"  // подсвечивание значения свапа
                                     min={1}
-                                    max={200}
+                                    max={300}
 
 
                                     disableSwap // отключил свап тоглов

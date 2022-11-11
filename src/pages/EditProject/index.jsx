@@ -12,7 +12,7 @@ import {ReactComponent as ChevronRight} from "../../image/icons/chevron-right.sv
 import {translate} from "../../utils/Utils";
 
 
-export const Admin = () => {
+export const EditProject = () => {
     const isAuth = useSelector(selectIsAuth)
     const dispatch = useDispatch()
     const id = useParams().id;
@@ -174,6 +174,16 @@ export const Admin = () => {
             projectInfo.preview.push(photo);
         }
         setProjectInfo({...projectInfo, preview: projectInfo.preview})
+    }
+
+    const removeProject = async () => {
+        let result = window.confirm("Вы уверены?");
+        if (result) {
+            const {data} = await axios.delete(`/projects/${id}`);
+            console.log(data)
+            alert("success: " + data.success);
+            return <Redirect to="/admin/all" />
+        }
     }
 
 
@@ -378,6 +388,7 @@ export const Admin = () => {
                     <button className={st.updateButton}>Обновить</button>
 
                 </form>
+                <button className={st.removeButton} onClick={removeProject}>Удалить проект</button>
 
 
             </div>

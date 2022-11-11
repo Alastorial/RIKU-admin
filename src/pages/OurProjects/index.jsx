@@ -5,7 +5,7 @@ import { MiniProject } from "../../components/UI/MiniProject/MiniProject";
 import { useFilterProjects } from "../../hooks/useFilterProjects";
 import {useDispatch, useSelector} from "react-redux";
 import {logout, selectIsAuth} from "../../redux/slices/auth";
-import {Redirect} from "react-router-dom";
+import {Link, Redirect} from "react-router-dom";
 import axios from "../../axios";
 
 
@@ -24,7 +24,7 @@ export const OurProjects = () => {
         threeRoom: false,
         fourPlusRoom: false,
         sMin: 1,
-        sMax: 200,
+        sMax: 300,
         sortBy: "date",
         sortToUp: false
     });
@@ -42,6 +42,7 @@ export const OurProjects = () => {
 
     useEffect(() => {
         axios.get("/projects").then(res => {
+            console.log(res.data)
             setProjectsInfo(res.data)
             // console.log(res.data[0]);
         });
@@ -78,6 +79,7 @@ export const OurProjects = () => {
                 {/*    <button className={st.showMore} onClick={() => setNumOfVisProj(numOfVisPro + 6)}>ПОКАЗАТЬ ЕЩЕ</button>*/}
                 {/*}*/}
             </div>
+            <Link to={"/admin/create"}>Создать проект</Link>
 
         </div>
 
