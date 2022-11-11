@@ -95,6 +95,7 @@ export const Admin = () => {
         await axios.post(`/image/${projectInfo.name}`, formData)
 
         // обновляем данные в монгоДБ
+        data.date = data.date.split('-').reverse().join('.')
         const answer = await axios.patch(`projects/${id}`, {...projectInfo, ...data, lastName: projectInfo.name});
         projectInfo.name = data.name;
         alert("success: " + answer.data.success);
