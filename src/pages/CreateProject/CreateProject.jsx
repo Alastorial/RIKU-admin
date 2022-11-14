@@ -19,8 +19,13 @@ export const CreateProject = () => {
     // массив с загруженными админом фотографиями
     const [newPhoto, setNewPhoto] = useState([]);
 
+    // массив с именами загруженных фото для превью
+    const [newPhotoPreview, setNewPhotoPreview] = useState([]);
+
+    // массив с base64 представлениями загруженных фоток
     const [newPhotoBase64, setNewPhotoBase64] = useState([]);
 
+    // ссылка на элемент вставки фотографий
     const inputFileRef = useRef(null); // сюда мы привяжем поле для загрузки картинок
 
     const onClickLogout = () => {
@@ -52,7 +57,7 @@ export const CreateProject = () => {
 
         // обновляем данные в монгоДБ
         data.date = data.date.split('-').reverse().join('.')
-        const answer = await axios.post(`projects`, {photo: photo, preview: [], ...data});
+        const answer = await axios.post(`projects`, {photo: photo, preview: newPhotoPreview, ...data});
         alert("success: " + answer.data.success);
         // <Redirect to="/admin/all" />
     }
@@ -62,6 +67,7 @@ export const CreateProject = () => {
     function loadNewPhoto() {
         newPhotoBase64.length = 0
         setNewPhotoBase64(newPhotoBase64)
+        setNewPhotoPreview([])
 
         var files = inputFileRef.current.files;
 
@@ -87,6 +93,20 @@ export const CreateProject = () => {
         setNewPhoto(inputFileRef.current.files)
 
     }
+
+    const setNewPreview = (photo) => {
+        console.log(photo)
+        if (newPhotoPreview.indexOf(photo) >= 0) {
+            // newPhotoPreview.splice(newPhotoPreview.indexOf(photo), 1);
+            setNewPhotoPreview(newPhotoPreview.filter((e) => e !== photo))
+        } else {
+            setNewPhotoPreview([...newPhotoPreview, photo])
+        }
+    }
+
+    useEffect(() => {
+        console.log(newPhotoPreview)
+    }, [newPhotoPreview])
 
     return (
         <div>
@@ -245,9 +265,11 @@ export const CreateProject = () => {
                     {(newPhoto.length !== 0 && newPhotoBase64.length !== 0) && (
                         <div className={st.gallery}>
                             {/* идем по названиям фотографий в данных о проекте с сервера */}
-                            {[...Array(newPhoto.length)].map((s, id) =>
+                            {[...Array(newPhoto.length)].map((p, id) =>
                                 <div className={`${st.photoBlock} ${st.newPhotoBlock}`} key={id}>
                                     <img className={st.photo} src={newPhotoBase64[id]} alt={newPhoto[id].name}/>
+                                    <input type={"checkbox"} className={st.checkBox} onChange={() => setNewPreview(newPhoto[id].name)} checked={newPhotoPreview.indexOf(newPhoto[id].name) >= 0}/>
+                                    <p className={st.previewNum}>{newPhotoPreview.indexOf(newPhoto[id].name) >= 0 && newPhotoPreview.indexOf(newPhoto[id].name) + 1}</p>
                                     <span className={st.fileName}>{newPhoto[id].name}</span>
                                 </div>
                             )}

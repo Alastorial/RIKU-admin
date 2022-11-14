@@ -34,6 +34,7 @@ export const EditProject = () => {
 
     const inputFileRef = useRef(null); // сюда мы привяжем поле для загрузки картинок
 
+    // загрузка уже имеющихся данных
     useEffect(() => {
         axios.get(`/projects/${id}`).then(res => {
             setProjectInfo(res.data)
