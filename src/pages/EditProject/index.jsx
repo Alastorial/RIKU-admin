@@ -32,6 +32,9 @@ export const EditProject = () => {
 
     const [newPhotoBase64, setNewPhotoBase64] = useState([]);
 
+    // массив с именами загруженных фото для превью
+    const [newPhotoPreview, setNewPhotoPreview] = useState([]);
+
     const inputFileRef = useRef(null); // сюда мы привяжем поле для загрузки картинок
 
     // загрузка уже имеющихся данных
@@ -97,7 +100,7 @@ export const EditProject = () => {
 
         // обновляем данные в монгоДБ
         data.date = data.date.split('-').reverse().join('.')
-        const answer = await axios.patch(`projects/${id}`, {...projectInfo, ...data, lastName: projectInfo.name});
+        const answer = await axios.patch(`projects/${id}`, {...projectInfo, ...data, preview: [...projectInfo.preview, ...newPhotoPreview], lastName: projectInfo.name});
         projectInfo.name = data.name;
         alert("success: " + answer.data.success);
         window.location.reload();
@@ -142,6 +145,7 @@ export const EditProject = () => {
     function loadNewPhoto() {
         newPhotoBase64.length = 0
         setNewPhotoBase64(newPhotoBase64)
+        setNewPhotoPreview([])
 
         var files = inputFileRef.current.files;
 
@@ -175,6 +179,16 @@ export const EditProject = () => {
             projectInfo.preview.push(photo);
         }
         setProjectInfo({...projectInfo, preview: projectInfo.preview})
+    }
+
+    const setNewPreview = (photo) => {
+        console.log(photo)
+        if (newPhotoPreview.indexOf(photo) >= 0) {
+            // newPhotoPreview.splice(newPhotoPreview.indexOf(photo), 1);
+            setNewPhotoPreview(newPhotoPreview.filter((e) => e !== photo))
+        } else {
+            setNewPhotoPreview([...newPhotoPreview, photo])
+        }
     }
 
     const removeProject = async () => {
@@ -352,6 +366,8 @@ export const EditProject = () => {
                             {[...Array(newPhoto.length)].map((s, id) =>
                                 <div className={`${st.photoBlock} ${st.newPhotoBlock}`} key={id}>
                                     <img className={st.photo} src={newPhotoBase64[id]} alt={newPhoto[id].name}/>
+                                    <input type={"checkbox"} className={st.checkBox} onChange={() => setNewPreview(newPhoto[id].name)} checked={newPhotoPreview.indexOf(newPhoto[id].name) >= 0}/>
+                                    <p className={st.previewNum}>{newPhotoPreview.indexOf(newPhoto[id].name) >= 0 && newPhotoPreview.indexOf(newPhoto[id].name) + 1}</p>
                                     <span className={st.fileName}>{newPhoto[id].name}</span>
                                 </div>
                             )}
