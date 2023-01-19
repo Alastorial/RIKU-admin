@@ -1,6 +1,6 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {useDispatch, useSelector} from "react-redux";
-import {logout, selectIsAuth} from "../../redux/slices/auth";
+import React, {useEffect, useMemo, useRef, useState} from 'react';
+import {useDispatch} from "react-redux";
+import {logout} from "../../redux/slices/auth";
 import {Redirect, useParams} from "react-router-dom";
 import st from "./EditProject.module.css"
 import axios from "../../axios";
@@ -10,13 +10,16 @@ import {ReactComponent as Close} from "../../image/icons/close.svg";
 import {ReactComponent as ChevronLeft} from "../../image/icons/chevron-left.svg";
 import {ReactComponent as ChevronRight} from "../../image/icons/chevron-right.svg";
 import {translate} from "../../utils/Utils";
+import SimpleMDE from "react-simplemde-editor";
+import "easymde/dist/easymde.min.css";
 
 
 export const EditProject = () => {
-    const isAuth = useSelector(selectIsAuth)
     const dispatch = useDispatch()
     const id = useParams().id;
     const [projectInfo, setProjectInfo] = useState({})
+
+    const [text, setText] = useState("");
 
     //  словарь с фотографиями (словарь, чтобы хранить все фотки в нужном порядке)
     const [arr, setArr] = useState({}) // массив с base64 представлениями фотографий
@@ -58,6 +61,7 @@ export const EditProject = () => {
                 })
             }
             // устанавливаем значения в поля формы
+            setText(res.data.description)
             setValue('name', res.data.name, {shouldValidate: true})
             setValue('description', res.data.description, {shouldValidate: true})
             setValue('type', res.data.type, {shouldValidate: true})
@@ -100,13 +104,13 @@ export const EditProject = () => {
 
         // обновляем данные в монгоДБ
         data.date = data.date.split('-').reverse().join('.')
-        const answer = await axios.patch(`projects/${id}`, {...projectInfo, ...data, preview: [...projectInfo.preview, ...newPhotoPreview], lastName: projectInfo.name});
+        const answer = await axios.patch(`projects/${id}`, {...projectInfo, ...data, preview: [...projectInfo.preview, ...newPhotoPreview], lastName: projectInfo.name, description: text});
         projectInfo.name = data.name;
         alert("success: " + answer.data.success);
         window.location.reload();
     }
 
-    const {register, handleSubmit, formState: {errors}, reset, setValue} = useForm({mode: "onBlur"})
+    const {register, handleSubmit, formState: {errors}, setValue} = useForm({mode: "onBlur"})
 
     // функция удаления названия фотографии из projectInfo и представления фотографии в base64 из arr
     const removePhoto = (photo) => {
@@ -201,6 +205,27 @@ export const EditProject = () => {
         }
     }
 
+    // использование useCallback - необходимо для SimpleMDE
+    const onChange = React.useCallback((value) => {
+        setText(value);
+    }, []);
+
+
+// настройки SimpleMDE тоже нужно оборачивать в useMemo
+    const options = useMemo(
+        () => ({
+            spellChecker: false,
+            maxHeight: "600px",
+            autofocus: true,
+            placeholder: "Введите текст...",
+            autosave: {
+                enabled: true,
+                uniqueId: "demo",
+                delay: 0,
+            },
+        }),
+        []
+    );
 
     useEffect(() => {
         // console.log(projectInfo)
@@ -228,17 +253,27 @@ export const EditProject = () => {
                         {errors?.name && <p>{errors?.name?.message}</p>}
                     </div>
 
-                    <textarea
-                        className={`${st.input} ${st.textArea}`}
-                        placeholder={"Описание"}
-                        {...register("description", {
-                            required: "Укажите описание проекта",
-                            minLength: {
-                                value: 10,
-                                message: "Минимум 10 символов"
-                            }
-                        })}
+                    <SimpleMDE
+                        options={options}
+                        id="demo"
+                        value={text}
+                        onChange={onChange}
                     />
+
+                    {/*<textarea*/}
+                    {/*    className={`${st.input} ${st.textArea}`}*/}
+                    {/*    placeholder={"Описание"}*/}
+                    {/*    {...register("description", {*/}
+                    {/*        required: "Укажите описание проекта",*/}
+                    {/*        minLength: {*/}
+                    {/*            value: 10,*/}
+                    {/*            message: "Минимум 10 символов"*/}
+                    {/*        }*/}
+                    {/*    })}*/}
+                    {/*/>*/}
+
+
+
                     <div className={st.inputErrorMessage}>
                         {errors?.description && <p>{errors?.description?.message}</p>}
                     </div>
