@@ -19,6 +19,7 @@ export const EditProject = () => {
     const id = useParams().id;
     const [projectInfo, setProjectInfo] = useState({})
 
+    // главный маркдаун текст
     const [text, setText] = useState("");
 
     //  словарь с фотографиями (словарь, чтобы хранить все фотки в нужном порядке)
@@ -40,11 +41,15 @@ export const EditProject = () => {
 
     const inputFileRef = useRef(null); // сюда мы привяжем поле для загрузки картинок
 
+    // видно ли проект пользователям
+    const [isVisible, setIsVisible] = useState(false);
+
     // загрузка уже имеющихся данных
     useEffect(() => {
         axios.get(`/projects/${id}`).then(res => {
             setProjectInfo(res.data)
             setIsLoading(false)
+            setIsVisible(res.data.visible)
             for (let i = 0; i < res.data.photo.length; i++) {
                 const image = {
                     title: res.data.name,
@@ -60,8 +65,8 @@ export const EditProject = () => {
                     return res.data
                 })
             }
-            // устанавливаем значения в поля формы
             setText(res.data.description)
+            // устанавливаем значения в поля формы
             setValue('name', res.data.name, {shouldValidate: true})
             setValue('description', res.data.description, {shouldValidate: true})
             setValue('type', res.data.type, {shouldValidate: true})
@@ -70,6 +75,7 @@ export const EditProject = () => {
             setValue('numberOfRooms', res.data.numberOfRooms, {shouldValidate: true})
             setValue('area', res.data.area, {shouldValidate: true})
             setValue('popular', res.data.popular, {shouldValidate: true})
+            setValue('visible', res.data.visible)
             let date = res.data.date.split(".").reverse().join('-');
             setValue('date', date, {shouldValidate: true})
         });
@@ -102,12 +108,14 @@ export const EditProject = () => {
         // загружаем фотографии на бэк
         await axios.post(`/image/${projectInfo.name}`, formData)
 
+        console.log("visible: " + isVisible)
+
         // обновляем данные в монгоДБ
         data.date = data.date.split('-').reverse().join('.')
-        const answer = await axios.patch(`projects/${id}`, {...projectInfo, ...data, preview: [...projectInfo.preview, ...newPhotoPreview], lastName: projectInfo.name, description: text});
+        const answer = await axios.patch(`projects/${id}`, {...projectInfo, ...data, preview: [...projectInfo.preview, ...newPhotoPreview], lastName: projectInfo.name, description: text, visible: isVisible});
         projectInfo.name = data.name;
         alert("success: " + answer.data.success);
-        window.location.reload();
+        // window.location.reload();
     }
 
     const {register, handleSubmit, formState: {errors}, setValue} = useForm({mode: "onBlur"})
@@ -143,7 +151,7 @@ export const EditProject = () => {
     }
 
     useEffect(() => {
-        console.log(projectInfo.preview)
+        console.log(projectInfo)
     }, [projectInfo])
 
     function loadNewPhoto() {
@@ -211,6 +219,12 @@ export const EditProject = () => {
     }, []);
 
 
+    const onChangeVisible = (value) => {
+        console.log(value.target.checked)
+        setIsVisible(value.target.checked);
+    }
+
+
 // настройки SimpleMDE тоже нужно оборачивать в useMemo
     const options = useMemo(
         () => ({
@@ -259,20 +273,6 @@ export const EditProject = () => {
                         value={text}
                         onChange={onChange}
                     />
-
-                    {/*<textarea*/}
-                    {/*    className={`${st.input} ${st.textArea}`}*/}
-                    {/*    placeholder={"Описание"}*/}
-                    {/*    {...register("description", {*/}
-                    {/*        required: "Укажите описание проекта",*/}
-                    {/*        minLength: {*/}
-                    {/*            value: 10,*/}
-                    {/*            message: "Минимум 10 символов"*/}
-                    {/*        }*/}
-                    {/*    })}*/}
-                    {/*/>*/}
-
-
 
                     <div className={st.inputErrorMessage}>
                         {errors?.description && <p>{errors?.description?.message}</p>}
@@ -372,7 +372,6 @@ export const EditProject = () => {
                         <div className={st.inputBlock}>
                             <select
                                 className={`${st.input} ${st.inputTags}`}
-                                placeholder={"Дата публикации"}
                                 {...register("type", {
                                     required: "Укажите тип проекта",
                                     minLength: {
@@ -389,6 +388,15 @@ export const EditProject = () => {
                                 {errors?.type && <p>{errors?.type?.message}</p>}
                             </div>
                         </div>
+                            <div className={st.visible}>
+                                <label htmlFor={"visible"}>Виден</label>
+                                <input type={"checkbox"}
+                                       id={"visible"}
+                                       checked={isVisible}
+                                       onChange={(e) => setIsVisible(e.target.checked)}
+
+                                />
+                            </div>
                         {/*<form encType="multipart/form-data" method="post">*/}
                             <input ref={inputFileRef} type={"file"} onChange={loadNewPhoto} multiple name={"imagesArray"} accept="image/jpeg,image/png,image/jpg, image/heic, image/HEIC"/>
                         {/*</form>*/}

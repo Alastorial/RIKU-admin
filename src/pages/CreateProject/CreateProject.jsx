@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import {logout, selectIsAuth} from "../../redux/slices/auth";
 import {Redirect, useParams} from "react-router-dom";
@@ -10,10 +10,15 @@ import {ReactComponent as Close} from "../../image/icons/close.svg";
 import {ReactComponent as ChevronLeft} from "../../image/icons/chevron-left.svg";
 import {ReactComponent as ChevronRight} from "../../image/icons/chevron-right.svg";
 import {translate} from "../../utils/Utils";
+import SimpleMDE from "react-simplemde-editor";
 
 
 export const CreateProject = () => {
     const dispatch = useDispatch()
+
+    // главный маркдаун текст
+    const [text, setText] = useState("");
+
     const [photo, setPhoto] = useState([])
 
     // массив с загруженными админом фотографиями
@@ -24,6 +29,9 @@ export const CreateProject = () => {
 
     // массив с base64 представлениями загруженных фоток
     const [newPhotoBase64, setNewPhotoBase64] = useState([]);
+
+    // видно ли проект пользователям
+    const [isVisible, setIsVisible] = useState(true);
 
     // ссылка на элемент вставки фотографий
     const inputFileRef = useRef(null); // сюда мы привяжем поле для загрузки картинок
@@ -53,11 +61,11 @@ export const CreateProject = () => {
             }
         }
         // загружаем фотографии на бэк
-        await axios.post(`/image/${data.name}`, formData)
-
+        const answer2 = await axios.post(`/image/${data.name}`, formData)
+        console.log(answer2)
         // обновляем данные в монгоДБ
         data.date = data.date.split('-').reverse().join('.')
-        const answer = await axios.post(`projects`, {photo: photo, preview: newPhotoPreview, ...data});
+        const answer = await axios.post(`projects`, {photo: photo, preview: newPhotoPreview, ...data, visible: isVisible, description: text});
         alert("success: " + answer.data.success);
         // <Redirect to="/admin/all" />
     }
@@ -104,6 +112,27 @@ export const CreateProject = () => {
         }
     }
 
+    // настройки SimpleMDE тоже нужно оборачивать в useMemo
+    const options = useMemo(
+        () => ({
+            spellChecker: false,
+            maxHeight: "600px",
+            autofocus: true,
+            placeholder: "Введите текст...",
+            autosave: {
+                enabled: true,
+                uniqueId: "demo",
+                delay: 0,
+            },
+        }),
+        []
+    );
+
+    // использование useCallback - необходимо для SimpleMDE
+    const onChange = React.useCallback((value) => {
+        setText(value);
+    }, []);
+
     useEffect(() => {
         console.log(newPhotoPreview)
     }, [newPhotoPreview])
@@ -130,16 +159,11 @@ export const CreateProject = () => {
                         {errors?.name && <p>{errors?.name?.message}</p>}
                     </div>
 
-                    <textarea
-                        className={`${st.input} ${st.textArea}`}
-                        placeholder={"Описание"}
-                        {...register("description", {
-                            required: "Укажите описание проекта",
-                            minLength: {
-                                value: 10,
-                                message: "Минимум 10 символов"
-                            }
-                        })}
+                    <SimpleMDE
+                        options={options}
+                        id="demo"
+                        value={text}
+                        onChange={onChange}
                     />
                     <div className={st.inputErrorMessage}>
                         {errors?.description && <p>{errors?.description?.message}</p>}
@@ -255,6 +279,14 @@ export const CreateProject = () => {
                             <div className={st.inputErrorMessage}>
                                 {errors?.type && <p>{errors?.type?.message}</p>}
                             </div>
+                        </div>
+                        <div className={st.visible}>
+                            <label htmlFor={"visible"}>Виден</label>
+                            <input type={"checkbox"}
+                                   id={"visible"}
+                                   checked={isVisible}
+                                   onChange={(e) => setIsVisible(e.target.checked)}
+                            />
                         </div>
                         {/*<form encType="multipart/form-data" method="post">*/}
                         <input ref={inputFileRef} type={"file"} onChange={loadNewPhoto} multiple name={"imagesArray"} accept="image/jpeg,image/png,image/jpg, image/heic, image/HEIC"/>
