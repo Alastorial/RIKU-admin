@@ -4,3 +4,64 @@
     max-width: 1440px;
     font-family: "Noah Text", sans-serif;
 }
+
+
+.title {
+    display: block;
+    font-family: "Noah Head", sans-serif;
+    margin-top: 20px;
+    font-size: 48px;
+    font-weight: 400;
+    text-align: center;
+}
+
+.mainBlock {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.callBlock {
+    width: 100%;
+    display: flex;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    justify-content: space-between;
+    height: 130px;
+    background-color: #ebf2ff;
+}
+
+.leftBlock {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.leftBlock span {
+    /*margin-bottom: 5px;*/
+}
+
+.rightBlock {
+    display: flex;
+    align-items: center;
+}
+
+.rightBlock textarea {
+    height: 100%;
+    width: 350px;
+}
+
+.rightBlock input {
+    margin: 0 20px 0 5px;
+    width: 20px;
+    height: 20px;
+}
+
+.rightBlock span {
+    overflow: auto;
+    height: 100%;
+    width: 350px;
+    background-color: white;
+}
