@@ -308,7 +308,7 @@ export const CreateProject = () => {
                                     <input type={"checkbox"} className={st.checkBox}
                                            onChange={() => setNewPreview(newPhoto[id].name)}
                                            checked={newPhotoPreview.indexOf(newPhoto[id].name) >= 0}/>
-                                    <p className={st.previewNum}>{newPhotoPreview.indexOf(newPhoto[id].name) >= 0 && newPhotoPreview.indexOf(newPhoto[id].name) + 1}</p>
+                                     <p className={st.previewNum}>{newPhotoPreview.indexOf(newPhoto[id].name) >= 0 && newPhotoPreview.indexOf(newPhoto[id].name) + 1}</p>
                                     <span className={st.fileName}>{newPhoto[id].name}</span>
                                 </div>
                             )}
