@@ -65,7 +65,12 @@ export const CreateProject = () => {
         console.log(answer2)
         // обновляем данные в монгоДБ
         data.date = data.date.split('-').reverse().join('.')
-        const answer = await axios.post(`projects`, {photo: photo, preview: newPhotoPreview, ...data, visible: isVisible, description: text});
+        const answer = await axios.post(`projects`, {
+            photo: photo,
+            preview: newPhotoPreview, ...data,
+            visible: isVisible,
+            description: text
+        });
         alert("success: " + answer.data.success);
         // <Redirect to="/admin/all" />
     }
@@ -139,7 +144,6 @@ export const CreateProject = () => {
 
     return (
         <div>
-            <button onClick={onClickLogout}>Выйти</button>
             <div className={st.container}>
                 <span className={st.title}>Редактор проекта</span>
                 <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
@@ -289,7 +293,8 @@ export const CreateProject = () => {
                             />
                         </div>
                         {/*<form encType="multipart/form-data" method="post">*/}
-                        <input ref={inputFileRef} type={"file"} onChange={loadNewPhoto} multiple name={"imagesArray"} accept="image/jpeg,image/png,image/jpg, image/heic, image/HEIC"/>
+                        <input ref={inputFileRef} type={"file"} onChange={loadNewPhoto} multiple name={"imagesArray"}
+                               accept="image/jpeg,image/png,image/jpg, image/heic, image/HEIC"/>
                         {/*</form>*/}
 
                     </div>
@@ -300,7 +305,9 @@ export const CreateProject = () => {
                             {[...Array(newPhoto.length)].map((p, id) =>
                                 <div className={`${st.photoBlock} ${st.newPhotoBlock}`} key={id}>
                                     <img className={st.photo} src={newPhotoBase64[id]} alt={newPhoto[id].name}/>
-                                    <input type={"checkbox"} className={st.checkBox} onChange={() => setNewPreview(newPhoto[id].name)} checked={newPhotoPreview.indexOf(newPhoto[id].name) >= 0}/>
+                                    <input type={"checkbox"} className={st.checkBox}
+                                           onChange={() => setNewPreview(newPhoto[id].name)}
+                                           checked={newPhotoPreview.indexOf(newPhoto[id].name) >= 0}/>
                                     <p className={st.previewNum}>{newPhotoPreview.indexOf(newPhoto[id].name) >= 0 && newPhotoPreview.indexOf(newPhoto[id].name) + 1}</p>
                                     <span className={st.fileName}>{newPhoto[id].name}</span>
                                 </div>
@@ -308,7 +315,10 @@ export const CreateProject = () => {
                         </div>
                     )}
 
-                    <button className={st.updateButton}>Обновить</button>
+                    <div className={st.navbar}>
+                        <button className={st.updateButton} type={"submit"}>Создать</button>
+                        <button className={st.logout} onClick={onClickLogout}>Выйти</button>
+                    </div>
 
                 </form>
 

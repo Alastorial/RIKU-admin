@@ -247,7 +247,6 @@ export const EditProject = () => {
 
     return (
         <div>
-            <button onClick={onClickLogout}>Выйти</button>
             <div className={st.container}>
                 <span className={st.title}>Редактор проекта</span>
                 <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
@@ -445,10 +444,17 @@ export const EditProject = () => {
                         </div>
                     )}
 
-                    <button className={st.updateButton}>Обновить</button>
+                    <div className={st.navbar}>
+                        <div>
+                            <button className={st.updateButton} type={"submit"}>Обновить</button>
+                            <button className={st.removeButton} onClick={removeProject}>Удалить проект</button>
+                        </div>
+
+
+                        <button className={st.logout} onClick={onClickLogout}>Выйти</button>
+                    </div>
 
                 </form>
-                <button className={st.removeButton} onClick={removeProject}>Удалить проект</button>
 
 
             </div>

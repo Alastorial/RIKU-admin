@@ -63,7 +63,6 @@ export const OurProjects = () => {
 
     return (
         <div>
-            <button onClick={onClickLogout}>Выйти</button>
             {/*<motion.span custom={5} variants={animation} className={st.ourProjectsText}>НАШИ ПРОЕКТЫ</motion.span>*/}
             <span className={st.ourProjectsText}>ПРОЕКТЫ</span>
             <Filter filters={filters} setFilters={setFilters} projectsInfo={projectsInfo}/>
@@ -79,8 +78,14 @@ export const OurProjects = () => {
                 {/*    <button className={st.showMore} onClick={() => setNumOfVisProj(numOfVisPro + 6)}>ПОКАЗАТЬ ЕЩЕ</button>*/}
                 {/*}*/}
             </div>
-            <Link to={"/admin/create"}>Создать проект</Link>
 
+            <div className={st.navbar}>
+                <div>
+                    <Link className={st.createProject} to={"/admin/create"}>Создать проект</Link>
+                    <Link className={st.checkCallBacks} to={"/admin/callbacks"}>Заявки</Link>
+                </div>
+                <button className={st.logout} onClick={onClickLogout}>Выйти</button>
+            </div>
         </div>
 
     );

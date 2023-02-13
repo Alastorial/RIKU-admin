@@ -70,5 +70,41 @@
     }
 }
 
+.navbar {
+    width: 100%;
+    top: 0;
+    left: 0;
+    position: fixed;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
+.logout {
+    cursor: pointer;
+    background-color: #ff3d3d;
+    border: none;
+    padding: 7px 15px;
+    border-radius: 4px;
+    color: black;
+    font-size: 16px;
+    margin: 20px;
+}
 
+.createProject {
+    text-decoration: none;
+    margin: 20px;
+    background-color: #7fef71;
+    padding: 7px 15px;
+    color: black;
+    border-radius: 4px;
+}
+
+.checkCallBacks {
+    text-decoration: none;
+    margin: 20px;
+    background-color: #71b6ef;
+    padding: 7px 15px;
+    border-radius: 4px;
+    color: black;
+}
