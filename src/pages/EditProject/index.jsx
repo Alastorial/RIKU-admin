@@ -114,7 +114,7 @@ export const EditProject = () => {
         data.date = data.date.split('-').reverse().join('.')
         const answer = await axios.patch(`projects/${id}`, {...projectInfo, ...data, preview: [...projectInfo.preview, ...newPhotoPreview], lastName: projectInfo.name, description: text, visible: isVisible});
         projectInfo.name = data.name;
-        alert("success: " + answer.data.success);
+        alert("success:123 " + answer.data.success);
         // window.location.reload();
     }
 
@@ -447,7 +447,7 @@ export const EditProject = () => {
                     <div className={st.navbar}>
                         <div>
                             <button className={st.updateButton} type={"submit"}>Обновить</button>
-                            <button className={st.removeButton} onClick={removeProject}>Удалить проект</button>
+                            <button className={st.removeButton} type={"button"} onClick={removeProject}>Удалить проект</button>
                         </div>
 
 

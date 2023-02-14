@@ -45,34 +45,39 @@ export const CreateProject = () => {
     };
 
     const onSubmit = async (data) => {
-        const formData = new FormData(); // это спец формат для вшития картинки и отправки ее на бэк
+        if (text !== "") {
+            const formData = new FormData(); // это спец формат для вшития картинки и отправки ее на бэк
 
-        // получаем загруженные файлы
-        const files = inputFileRef.current.files;
+            // получаем загруженные файлы
+            const files = inputFileRef.current.files;
 
-        //добавляем их в formData
-        for (let key of Object.keys(files)) {
-            const newFile = new File([files[key]], translate(files[key].name));
-            // files[key].name = translate(files[key].name)
-            formData.append('postImage', newFile)
-            // защита, чтобы не добавить дважды
-            if (photo.indexOf(newFile.name) === -1) {
-                photo.push(newFile.name)
+            //добавляем их в formData
+            for (let key of Object.keys(files)) {
+                const newFile = new File([files[key]], translate(files[key].name));
+                // files[key].name = translate(files[key].name)
+                formData.append('postImage', newFile)
+                // защита, чтобы не добавить дважды
+                if (photo.indexOf(newFile.name) === -1) {
+                    photo.push(newFile.name)
+                }
             }
+            // загружаем фотографии на бэк
+            const answer2 = await axios.post(`/image/${data.name}`, formData)
+            console.log(answer2)
+            // обновляем данные в монгоДБ
+            data.date = data.date.split('-').reverse().join('.')
+            const answer = await axios.post(`projects`, {
+                photo: photo,
+                preview: newPhotoPreview, ...data,
+                visible: isVisible,
+                description: text
+            });
+            alert("success: " + answer.data.success);
+            // <Redirect to="/admin/all" />
+        } else {
+            alert("Введите описание проекта");
         }
-        // загружаем фотографии на бэк
-        const answer2 = await axios.post(`/image/${data.name}`, formData)
-        console.log(answer2)
-        // обновляем данные в монгоДБ
-        data.date = data.date.split('-').reverse().join('.')
-        const answer = await axios.post(`projects`, {
-            photo: photo,
-            preview: newPhotoPreview, ...data,
-            visible: isVisible,
-            description: text
-        });
-        alert("success: " + answer.data.success);
-        // <Redirect to="/admin/all" />
+
     }
 
     const {register, handleSubmit, formState: {errors}, reset, setValue} = useForm({mode: "onBlur"})
