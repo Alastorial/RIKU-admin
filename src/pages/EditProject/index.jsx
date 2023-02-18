@@ -146,6 +146,9 @@ export const EditProject = () => {
             projectInfo.photo[indexPhotoInProjectInfo - 1] = projectInfo.photo[indexPhotoInProjectInfo];
             projectInfo.photo[indexPhotoInProjectInfo] = buffer;
         }
+        if (s === "up" && indexPhotoInProjectInfo > 0) {
+            projectInfo.photo.unshift(...projectInfo.photo.splice(indexPhotoInProjectInfo, 1));
+        }
 
         setProjectInfo({...projectInfo, photo: projectInfo.photo})
     }
@@ -424,13 +427,20 @@ export const EditProject = () => {
                                     {arr[p] ? (
                                             <>
                                                 <img className={st.photo} src={arr[p]} alt={projectInfo.photo[id]}/>
+
                                                 <input type={"checkbox"} className={st.checkBox} onChange={() => setPreview(p)} checked={projectInfo.preview.indexOf(p) >= 0}/>
                                                 <p className={st.previewNum}>{projectInfo.preview.indexOf(p) >= 0 && projectInfo.preview.indexOf(p) + 1}</p>
+
                                                 <Close className={st.closeButton} id={p} onClick={() => removePhoto(p)}/>
+
                                                 <ChevronLeft className={st.chevronLeft}/>
                                                 <div className={st.chevronLeftBlock} onClick={() => moveProjectPhoto('left', p)}></div>
                                                 <ChevronRight className={st.chevronRight}/>
                                                 <div className={st.chevronRightBlock} onClick={() => moveProjectPhoto('right', p)}></div>
+
+                                                <div className={st.upArrowBlock} onClick={() => moveProjectPhoto('up', p)}></div>
+                                                <ChevronRight className={st.upArrow}/>
+
                                                 <span className={st.fileName}>{projectInfo.photo[id]}</span>
 
                                             </>
