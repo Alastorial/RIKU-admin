@@ -15,7 +15,7 @@ export const Auth = () => {
 
     const { register, handleSubmit, formState: {errors} } = useForm({
         defaultValues: {
-            nickname: "",
+            username: "",
             password: "",
         },
         mode: "onChange"
@@ -23,14 +23,13 @@ export const Auth = () => {
 
     const onSubmit = async (value) => {
         const data = await dispatch(fetchAuth(value))
-        console.log(123)
         if (!data.payload) {
             return alert("Не удалось авторизоваться!")
         }
 
         // сохраняем токен в локал хранилище браузера
-        if ('token' in data.payload) {
-            window.localStorage.setItem('token', data.payload.token);
+        if ('tokenValue' in data.payload) {
+            window.localStorage.setItem('token', "Bearer " + data.payload.tokenValue);
         }
         // reset()
     }
@@ -49,7 +48,7 @@ export const Auth = () => {
                         className={st.input}
                         type={"text"}
                         placeholder={"Никнейм"}
-                        {...register("nickname", {
+                        {...register("username", {
                             required: "Укажите никнейм",
                             minLength: {
                                 value: 2,

@@ -119,6 +119,7 @@
     transform: translateY(-50%);
 }
 
+
 .chevronLeftBlock {
     z-index: 2;
     cursor: pointer;
@@ -167,6 +168,10 @@
     top: -8px;
     left: 50%;
     transform: translateX(-50%) rotate(-90deg);
+}
+
+.upArrow * {
+    stroke: black;
 }
 
 

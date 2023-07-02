@@ -4,13 +4,13 @@ import axios from "../../axios";
 
 // для логина
 export const fetchAuth = createAsyncThunk('auth/fetchAuth', async (params) => {
-    const {data} = await axios.post('/auth/login', params); // сам запрос
+    const {data} = await axios.post('/auth/authenticate', params); // сам запрос
     return data;
 })
 
 // для получения инфы, когда уже авторизован. здесь не указываем параметры, тк токен уже вшит в каждый запрос
 export const fetchAuthMe = createAsyncThunk('auth/fetchAuthMe', async () => {
-    const {data} = await axios.get('/auth/me'); // сам запрос
+    const {data} = await axios.post('/auth/me'); // сам запрос
     return data;
 })
 

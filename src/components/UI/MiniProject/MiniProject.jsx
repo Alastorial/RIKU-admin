@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {motion} from 'framer-motion';
 import st from './MiniProject.module.css';
 import {ReactComponent as Area} from "../../../image/icons/area.svg";
@@ -15,38 +15,43 @@ export const MiniProject = ({project}) => {
     const [currentPhoto, setCurrentPhoto] = useState();
 
 
-    // состояние для подгрузки очередной картинки
-    const [photo, setPhoto] = useState();
 
     //  словарь с base64 представлениями фотографий (словарь, чтобы хранить все фотки в нужном порядке)
-    const [arr2] = useState({}) // массив с base64 представлениями фотографий
+    const [photoBase64, setPhotoBase64] = useState({}) // массив с base64 представлениями фотографий
 
     // нужно, чтобы один раз загрузить
     // не использовал useEffect тк он ругается на отсутствие зависимостей
-    // получаем картинки для мини проекта
-    const [load, setLoad] = useState(true);
 
-    if (load) {
-        // console.log(234234)
-        for (let i = 0; i < project.preview.length; i++) {
-            const image = {
-                title: project.name,
-                name: project.preview[i],
+
+    // получаем картинки для мини проекта
+    useEffect(() => {
+        const controller = new AbortController();
+        const fetchPhoto = async () => {
+            if (project && project.photosId) { // Проверяем существование project и photosId
+                for (let i = 0; i < project.photosId.length; i++) {
+                    axios
+                        .get(`/photos/${project.photosId[i]}`, {
+                            signal: controller.signal
+                        })
+                        .then(({ data }) => {
+                            photoBase64[data.previewPosition - 1] = data.base64;
+                            setPhotoBase64({ ...photoBase64 });
+                            if (data.previewPosition - 1 === 0) setCurrentPhoto(data.base64);
+                        });
+                }
             }
-            axios.get(`/image/${image.title}/${image.name}`, image).then(res => {
-                if (i === 0) setCurrentPhoto(res.data)
-                setPhoto(photo)
-                setPhoto(res.data)
-                arr2[i] = res.data;
-                return res.data
-            })
         }
-        setLoad(false)
-    }
+        fetchPhoto();
+        return () => {
+            controller.abort();
+        };
+    }, [])
+
+
 
     // метод изменения фотографии сзади при ведении мышкой
     const setBackgroundPhoto = (id) => {
-        setCurrentPhoto(arr2[id])
+        setCurrentPhoto(photoBase64[id])
     }
 
 
@@ -69,8 +74,8 @@ export const MiniProject = ({project}) => {
     return (
         <motion.div initial="hidden" whileInView="visible" custom={2} viewport={{amount: 0, once: true}}
                     variants={animation} className={st.frame}
-                    onMouseLeave={() => setCurrentPhoto(arr2[0])}>
-            <Link to={`/admin/${project._id}`}>
+                    onMouseLeave={() => setCurrentPhoto(photoBase64[0])}>
+            <Link to={`/admin/${project.id}`}>
                 <div className={st.project}>
                     {currentPhoto ?
                         <>
@@ -97,9 +102,9 @@ export const MiniProject = ({project}) => {
                     </div>
                 </div>
                 <div className={st.lineBoxes}>
-                    {project.preview.map((i, id) =>
+                    {project.photosId.map((i, id) =>
                         <MiniProjectLine key={id} id={id} onMove={setBackgroundPhoto}
-                                         numOfLines={project.preview.length}/>
+                                         numOfLines={project.photosId.length}/>
                     )}
                 </div>
             </Link>

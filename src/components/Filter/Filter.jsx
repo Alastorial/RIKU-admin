@@ -30,7 +30,6 @@ const Filter = ({ filters, setFilters, projectsInfo }) => {
     }
 
     useEffect(() => {
-        console.log(searchedProjects)
     }, [searchedProjects])
 
     // функция обновления данных фильтра

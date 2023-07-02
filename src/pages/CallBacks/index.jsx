@@ -5,79 +5,59 @@ import {Link} from "react-router-dom";
 
 export const Callbacks = () => {
 
-    const [cbInfo, setCbInfo] = useState({});
+    let [cbInfo, setCbInfo] = useState([]);
     // идет ли загрузка данных проекта
     const [isLoading, setIsLoading] = useState(true);
 
-    // загрузка уже имеющихся данных
-    useEffect(() => {
-        axios.get(`/callBack`).then(res => {
+    const fetchCallBacks = async () => {
+        cbInfo.length = 0
+        setCbInfo([...cbInfo])
+
+        axios.get(`/callbacks`).then(res => {
             for (let i = 0; i < res.data.length; i++) {
-                cbInfo[i] = res.data[i]
+                cbInfo.push(res.data[i])
             }
             // setCbInfo(res.data)
             setIsLoading(false)
+            cbInfo = cbInfo.sort((cb1, cb2) => {
+                return new Date(cb1.createdAt) - new Date(cb2.createdAt);
+            });
+
+            setCbInfo([...cbInfo])
 
             // let date = res.data.date.split(".").reverse().join('-');
         });
+    }
+
+    // загрузка уже имеющихся данных
+    useEffect(() => {
+        fetchCallBacks();
     }, [])
 
     useEffect(() => {
-        console.log(cbInfo)
-        console.log(123)
     }, [cbInfo])
 
-    const changeSolved = async (e) => {
-        let id = e.target.id
-        console.log(id)
-        for (let i = 0; i < Object.values(cbInfo).length; i++) {
-            if (cbInfo[i]._id === id) {
-                cbInfo[i]["solved"] = e.target.checked;
-                setCbInfo({...cbInfo});
-                console.log(cbInfo)
-
-                const ans = await axios.patch(`/callBack/${id}`, {...cbInfo, solved: e.target.checked});
-
-                if (ans.data?.success) {
-                    alert("Успешно");
-                } else {
-                    alert(ans.data?.err)
+    const changeSolved = async (cb) => {
+        cb.solved = !cb.solved
+        await axios.patch(`callbacks`, {...cb},
+            {
+                params: {
+                    id: cb.id
                 }
-                break;
-            }
-        }
+            });
+        fetchCallBacks();
 
     }
 
-    const deleteCb = async (e) => {
-        let result = window.confirm("Вы уверены?");
-        let newInf = {}
-        let index = 0;
-        let ans;
-        if (result) {
-            let id = e.target.id
-            console.log(id)
-            for (let i = 0; i < Object.values(cbInfo).length; i++) {
-                if (cbInfo[i]._id === id) {
-                    index = 1;
-                    ans = await axios.delete(`/callBack/${id}`);
-
-                    if (ans.data?.success) {
-                        alert("Успешно");
-
-                    } else {
-                        alert(ans.data?.err)
-                    }
-                } else {
-                    newInf[i - index] = cbInfo[i]
+    const deleteCb = async (cb) => {
+        window.confirm("Вы уверены?");
+        await axios.delete(`callbacks`,
+            {
+                params: {
+                    id: cb.id
                 }
-            }
-            console.log(newInf)
-            if (ans.data?.success) {
-                setCbInfo({...newInf})
-            }
-
-        }
+            });
+        fetchCallBacks();
 
     }
 
@@ -90,23 +70,23 @@ export const Callbacks = () => {
 
                 {!isLoading && (
                     <div className={st.mainBlock}>
-                        {Object.values(cbInfo).map((info, id) =>
+                        {cbInfo.map((info, id) =>
 
-                            <div className={st.callBlock} key={info._id}>
+                            <div className={st.callBlock} key={info.id}>
                                 <div className={st.leftBlock}>
                                     <span>{info.createdAt}</span>
                                     <span>{info.name}</span>
                                     <span>{info.email}</span>
-                                    <span>{info.phone}</span>
+                                    <span>{info.phoneNumber}</span>
                                 </div>
 
                                 <div className={st.rightBlock}>
                                     <div className={st.buttons}>
                                         <div className={st.checkbox}>
-                                            <label htmlFor={info._id}>Обработано</label>
-                                            <input type={"checkbox"} id={info._id} onChange={changeSolved} checked={info.solved}/>
+                                            <label htmlFor={info.id}>Обработано</label>
+                                            <input type={"checkbox"} id={info.id} onChange={() => changeSolved(info)} checked={info.solved}/>
                                         </div>
-                                        <button className={st.deleteButton} id={info._id} onClick={deleteCb}>Удалить</button>
+                                        <button className={st.deleteButton} id={info.id} onClick={() => deleteCb(info)}>Удалить</button>
 
                                     </div>
                                     <span>{info.topic}</span>

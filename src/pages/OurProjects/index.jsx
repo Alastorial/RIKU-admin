@@ -42,7 +42,6 @@ export const OurProjects = () => {
 
     useEffect(() => {
         axios.get("/projects").then(res => {
-            console.log(res.data)
             setProjectsInfo(res.data)
             // console.log(res.data[0]);
         });
@@ -70,7 +69,7 @@ export const OurProjects = () => {
             <div className={st.gallery}>
                 {sortedProjectsInfo.map((project, id) =>
 
-                    <MiniProject project={project} key={project._id}/>
+                    <MiniProject project={project} key={project.id}/>
                 )}
 
                 {/*/!* если кол-во видимых постов не равно кол-ву пришедших данных *!/*/}

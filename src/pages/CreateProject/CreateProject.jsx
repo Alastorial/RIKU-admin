@@ -44,36 +44,55 @@ export const CreateProject = () => {
         }
     };
 
+    // Convert file to base64 string
+    const fileToBase64 = (file) => {
+        return new Promise(resolve => {
+            var reader = new FileReader();
+            // Read file content on file loaded event
+            reader.onload = function(event) {
+                resolve(event.target.result);
+            };
+
+            // Convert data to base64
+            reader.readAsDataURL(file);
+        });
+    };
+
     const onSubmit = async (data) => {
         if (text !== "") {
-            const formData = new FormData(); // это спец формат для вшития картинки и отправки ее на бэк
+            const answer = await axios.post(`projects`, {
+                ...data,
+                visible: isVisible,
+                description: text,
+                popular: 1,
+                area: Number(data.area),
+                numberOfRooms: Number(data.numberOfRooms)
+            });
 
             // получаем загруженные файлы
             const files = inputFileRef.current.files;
-
-            //добавляем их в formData
+            let photos = [];
+            // //добавляем их в formData
             for (let key of Object.keys(files)) {
-                const newFile = new File([files[key]], translate(files[key].name));
-                // files[key].name = translate(files[key].name)
-                formData.append('postImage', newFile)
-                // защита, чтобы не добавить дважды
-                if (photo.indexOf(newFile.name) === -1) {
-                    photo.push(newFile.name)
+                let photo = {
+                    preview: false
                 }
+                photo.name = translate(files[key].name);
+                await fileToBase64(files[key]).then(result => {
+                    photo.base64 = result;
+                });
+                if (newPhotoPreview.indexOf(photo.name) !== -1)
+                    photo.preview = true
+                photo.projectId = answer.data.id;
+                photos.push(photo)
             }
             // загружаем фотографии на бэк
-            const answer2 = await axios.post(`/image/${data.name}`, formData)
-            console.log(answer2)
-            // обновляем данные в монгоДБ
-            data.date = data.date.split('-').reverse().join('.')
-            const answer = await axios.post(`projects`, {
-                photo: photo,
-                preview: newPhotoPreview, ...data,
-                visible: isVisible,
-                description: text
-            });
-            alert("success: " + answer.data.success);
-            // <Redirect to="/admin/all" />
+            if (photos.length > 0)
+                await axios.post(`/photos/many`, photos)
+
+
+            if(answer.data)
+                alert("success");
         } else {
             alert("Введите описание проекта");
         }
@@ -100,8 +119,6 @@ export const CreateProject = () => {
             });
 
             reader.readAsDataURL(file);
-
-
         }
 
         if (files) {
@@ -113,7 +130,6 @@ export const CreateProject = () => {
     }
 
     const setNewPreview = (photo) => {
-        console.log(photo)
         if (newPhotoPreview.indexOf(photo) >= 0) {
             // newPhotoPreview.splice(newPhotoPreview.indexOf(photo), 1);
             setNewPhotoPreview(newPhotoPreview.filter((e) => e !== photo))
@@ -143,9 +159,8 @@ export const CreateProject = () => {
         setText(value);
     }, []);
 
-    useEffect(() => {
-        console.log(newPhotoPreview)
-    }, [newPhotoPreview])
+    // useEffect(() => {
+    // }, [newPhotoPreview])
 
     return (
         <div>
