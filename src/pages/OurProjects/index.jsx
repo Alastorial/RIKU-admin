@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import st from "./OurProjects.module.css"
 import Filter from "../../components/Filter/Filter";
 import { MiniProject } from "../../components/UI/MiniProject/MiniProject";
-import { useFilterProjects } from "../../hooks/useFilterProjects";
+import { filterProjects } from "../../hooks/filterProjects";
 import {useDispatch, useSelector} from "react-redux";
 import {logout, selectIsAuth} from "../../redux/slices/auth";
 import {Link, Redirect} from "react-router-dom";
@@ -12,6 +12,7 @@ import axios from "../../axios";
 export const OurProjects = () => {
     const dispatch = useDispatch()
     const isAuth = useSelector(selectIsAuth)
+    const [sortedProjectsInfo, setSortedProjectsInfo] = useState([])
 
 
     // дефолтные значения для фильтров на этой странице (передаем как пропсы)
@@ -24,7 +25,7 @@ export const OurProjects = () => {
         threeRoom: false,
         fourPlusRoom: false,
         sMin: 1,
-        sMax: 300,
+        sMax: 550,
         sortBy: "date",
         sortToUp: false
     });
@@ -48,8 +49,12 @@ export const OurProjects = () => {
     }, [])
 
     // здесь идет фильтрация и сортировка
-    const sortedProjectsInfo = useFilterProjects(projectsInfo, filters);
-
+    useEffect(() => {
+        // здесь идет фильтрация и сортировка
+        // console.log(projects.items)
+        if (projectsInfo.length !== 0)
+            setSortedProjectsInfo(filterProjects(projectsInfo, filters));
+    }, [projectsInfo, filters])
     //TODO добавить стрелочку-якорь наверх
 
     // отключено, тк идет отслеживание состояния шапки и каждый раз новый рандом перерисовывает проекты

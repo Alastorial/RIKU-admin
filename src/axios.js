@@ -3,7 +3,7 @@ import axios from "axios";
 
 
 const instance = axios.create({
-    // baseURL: 'http://localhost:8080'
+    // baseURL: 'http://localhost:8083'
     //     baseURL: 'https://api.riku-remont.ru'
         baseURL: 'https://api2.riku-remont.ru'
 })

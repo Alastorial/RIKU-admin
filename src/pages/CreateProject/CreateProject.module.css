@@ -177,17 +177,17 @@
     margin: 20px;
 }
 
-.visible {
+.checkbox {
     display: flex;
     align-items: center;
 }
 
-.visible label {
+.checkbox label {
     font-size: 16px;
     margin-right: 10px;
 }
 
-.visible input {
+.checkbox input {
     height: 20px;
     width: 20px;
 }

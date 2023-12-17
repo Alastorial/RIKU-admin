@@ -57,8 +57,8 @@ const filterByArea = (projectsInfo, filters) => {
 const sortBySort = (projectsInfo, filters) => {
     if (filters.sortBy === "date") {
         projectsInfo = projectsInfo.sort(function(a, b) {
-            const str1 = parseInt(a.date.split('.').reverse().join(''));
-            const str2 = parseInt(b.date.split('.').reverse().join(''));
+            const str1 = parseInt(a.date.split('-').join(''));
+            const str2 = parseInt(b.date.split('-').join(''));
             // console.log(str1 + ' ' + str2)
             return str1 - str2;
         });
@@ -75,7 +75,7 @@ const sortBySort = (projectsInfo, filters) => {
     return projectsInfo;
 }
 
-export const useFilterProjects = (projectsInfo, filters) => {
+export const filterProjects = (projectsInfo, filters) => {
     let newProjectsInfo = [];
     newProjectsInfo = filterByTypeOfObject(projectsInfo, filters);
     newProjectsInfo = filterByNumberOfRooms(newProjectsInfo, filters);

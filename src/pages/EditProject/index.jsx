@@ -44,11 +44,15 @@ export const EditProject = () => {
     // видно ли проект пользователям
     const [isVisible, setIsVisible] = useState(false);
 
+    // видно ли проект пользователям
+    const [isCompleted, setIsCompleted] = useState(true);
+
     const fetchPhoto = async () => {
         axios.get(`/projects/${id}`).then(res => {
             setProjectInfo(res.data)
             setIsLoading(false)
             setIsVisible(res.data.visible)
+            setIsCompleted(res.data.completed)
             for (let i = 0; i < res.data.photosId.length; i++) {
                 axios.get(`/photos/${res.data.photosId[i]}`).then(res => {
                     arr[res.data.position - 1] = res.data
@@ -123,7 +127,7 @@ export const EditProject = () => {
             await axios.post(`/photos/many`, photos)
 
 
-        const answer = await axios.patch(`projects`, {...projectInfo, ...data, description: text, visible: isVisible},
+        const answer = await axios.patch(`projects`, {...projectInfo, ...data, description: text, visible: isVisible, completed: isCompleted},
             {
                 params: {
                     id: projectInfo.id
@@ -432,15 +436,22 @@ export const EditProject = () => {
                                 {errors?.type && <p>{errors?.type?.message}</p>}
                             </div>
                         </div>
-                            <div className={st.visible}>
-                                <label htmlFor={"visible"}>Виден</label>
-                                <input type={"checkbox"}
-                                       id={"visible"}
-                                       checked={isVisible}
-                                       onChange={(e) => setIsVisible(e.target.checked)}
-
-                                />
-                            </div>
+                        <div className={st.visible}>
+                            <label htmlFor={"visible"}>Виден</label>
+                            <input type={"checkbox"}
+                                   id={"visible"}
+                                   checked={isVisible}
+                                   onChange={(e) => setIsVisible(e.target.checked)}
+                            />
+                        </div>
+                        <div className={st.visible}>
+                            <label htmlFor={"completed"}>Завершен</label>
+                            <input type={"checkbox"}
+                                   id={"completed"}
+                                   checked={isCompleted}
+                                   onChange={(e) => setIsCompleted(e.target.checked)}
+                            />
+                        </div>
                         {/*<form encType="multipart/form-data" method="post">*/}
                             <input ref={inputFileRef} type={"file"} onChange={loadNewPhoto} multiple name={"imagesArray"} accept="image/jpeg,image/png,image/jpg"/>
                         {/*</form>*/}

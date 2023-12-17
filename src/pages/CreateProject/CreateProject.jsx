@@ -32,6 +32,9 @@ export const CreateProject = () => {
 
     // видно ли проект пользователям
     const [isVisible, setIsVisible] = useState(true);
+    
+    // завершен ли проект
+    const [isCompleted, setIsCompleted] = useState(false);
 
     // ссылка на элемент вставки фотографий
     const inputFileRef = useRef(null); // сюда мы привяжем поле для загрузки картинок
@@ -59,43 +62,41 @@ export const CreateProject = () => {
     };
 
     const onSubmit = async (data) => {
-        if (text !== "") {
-            const answer = await axios.post(`projects`, {
-                ...data,
-                visible: isVisible,
-                description: text,
-                popular: 1,
-                area: Number(data.area),
-                numberOfRooms: Number(data.numberOfRooms)
-            });
+        const answer = await axios.post(`projects`, {
+            ...data,
+            visible: isVisible,
+            completed: isCompleted,
+            description: text ? text : "",
+            popular: 1,
+            area: Number(data.area),
+            numberOfRooms: Number(data.numberOfRooms)
+        });
 
-            // получаем загруженные файлы
-            const files = inputFileRef.current.files;
-            let photos = [];
-            // //добавляем их в formData
-            for (let key of Object.keys(files)) {
-                let photo = {
-                    preview: false
-                }
-                photo.name = translate(files[key].name);
-                await fileToBase64(files[key]).then(result => {
-                    photo.base64 = result;
-                });
-                if (newPhotoPreview.indexOf(photo.name) !== -1)
-                    photo.preview = true
-                photo.projectId = answer.data.id;
-                photos.push(photo)
+        // получаем загруженные файлы
+        const files = inputFileRef.current.files;
+        let photos = [];
+        // //добавляем их в formData
+        for (let key of Object.keys(files)) {
+            let photo = {
+                preview: false
             }
-            // загружаем фотографии на бэк
-            if (photos.length > 0)
-                await axios.post(`/photos/many`, photos)
-
-
-            if(answer.data)
-                alert("success");
-        } else {
-            alert("Введите описание проекта");
+            photo.name = translate(files[key].name);
+            await fileToBase64(files[key]).then(result => {
+                photo.base64 = result;
+            });
+            if (newPhotoPreview.indexOf(photo.name) !== -1)
+                photo.preview = true
+            photo.projectId = answer.data.id;
+            photos.push(photo)
         }
+        // загружаем фотографии на бэк
+        if (photos.length > 0)
+            await axios.post(`/photos/many`, photos)
+
+
+        if(answer.data)
+            alert("success");
+        
 
     }
 
@@ -304,12 +305,20 @@ export const CreateProject = () => {
                                 {errors?.type && <p>{errors?.type?.message}</p>}
                             </div>
                         </div>
-                        <div className={st.visible}>
+                        <div className={st.checkbox}>
                             <label htmlFor={"visible"}>Виден</label>
                             <input type={"checkbox"}
                                    id={"visible"}
                                    checked={isVisible}
                                    onChange={(e) => setIsVisible(e.target.checked)}
+                            />
+                        </div>
+                        <div className={st.checkbox}>
+                            <label htmlFor={"checkbox"}>Завершен</label>
+                            <input type={"checkbox"}
+                                   id={"checkbox"}
+                                   checked={isCompleted}
+                                   onChange={(e) => setIsCompleted(e.target.checked)}
                             />
                         </div>
                         {/*<form encType="multipart/form-data" method="post">*/}

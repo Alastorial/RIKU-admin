@@ -24,6 +24,7 @@ export const Auth = () => {
     const onSubmit = async (value) => {
         const data = await dispatch(fetchAuth(value))
         if (!data.payload) {
+            window.localStorage.removeItem('token')
             return alert("Не удалось авторизоваться!")
         }
 

@@ -94,7 +94,7 @@ export const MiniProject = ({project}) => {
                     </div>
                     <div className={st.param}>
                         <Calendar width={20}/>
-                        <span>{project.date}</span>
+                        <span>{project.date.split('-').reverse().join('.')}</span>
                     </div>
                     <div className={st.param}>
                         <Eye width={20}/>
