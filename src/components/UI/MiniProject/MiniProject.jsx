@@ -12,12 +12,12 @@ import Loader from "../Loader/Loader";
 export const MiniProject = ({project}) => {
 
     // текущее фото
-    const [currentPhoto, setCurrentPhoto] = useState();
+    const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
 
 
-    //  словарь с base64 представлениями фотографий (словарь, чтобы хранить все фотки в нужном порядке)
-    const [photoBase64, setPhotoBase64] = useState({}) // массив с base64 представлениями фотографий
+    //  словарь с ссылками на фотографии
+    const [photoUrl, setPhotoUrl] = useState({})
 
     // нужно, чтобы один раз загрузить
     // не использовал useEffect тк он ругается на отсутствие зависимостей
@@ -27,16 +27,20 @@ export const MiniProject = ({project}) => {
     useEffect(() => {
         const controller = new AbortController();
         const fetchPhoto = async () => {
-            if (project && project.photosId) { // Проверяем существование project и photosId
-                for (let i = 0; i < project.photosId.length; i++) {
+            if (project && project.photos) { // Проверяем существование project и photos
+                for (let i = 0; i < project.photos.length; i++) {
                     axios
-                        .get(`/photos/${project.photosId[i]}`, {
-                            signal: controller.signal
+                        .get(`/photos/${project.photos[i].id}`, {
+                            signal: controller.signal,
+                            responseType: 'blob'
                         })
-                        .then(({ data }) => {
-                            photoBase64[data.previewPosition - 1] = data.base64;
-                            setPhotoBase64({ ...photoBase64 });
-                            if (data.previewPosition - 1 === 0) setCurrentPhoto(data.base64);
+                        .then((response) => {
+                            
+                            // Создаем временный URL из объекта Blob
+                            photoUrl[project.photos[i].previewPosition - 1] = URL.createObjectURL(response.data);
+
+                            // Обновляем состояние с новым массивом фотографий
+                            setPhotoUrl({ ...photoUrl});
                         });
                 }
             }
@@ -51,7 +55,7 @@ export const MiniProject = ({project}) => {
 
     // метод изменения фотографии сзади при ведении мышкой
     const setBackgroundPhoto = (id) => {
-        setCurrentPhoto(photoBase64[id])
+        setCurrentPhotoIndex(id)
     }
 
 
@@ -70,16 +74,16 @@ export const MiniProject = ({project}) => {
 
     //TODO плавно сменять картинку
 
-    // при изменении currentPhoto будет изменяться бэкграунд проекта
+    // при изменении currentPhotoIndex будет изменяться бэкграунд проекта
     return (
         <motion.div initial="hidden" whileInView="visible" custom={2} viewport={{amount: 0, once: true}}
                     variants={animation} className={st.frame}
-                    onMouseLeave={() => setCurrentPhoto(photoBase64[0])}>
+                    onMouseLeave={() => setCurrentPhotoIndex(0)}>
             <Link to={`/admin/${project.id}`}>
                 <div className={st.project}>
-                    {currentPhoto ?
+                    {photoUrl[currentPhotoIndex] ?
                         <>
-                            <img src={currentPhoto} alt={"miniPhoto"} className={st.projectPhoto}/>
+                            <img src={photoUrl[currentPhotoIndex]} alt={"miniPhoto"} className={st.projectPhoto}/>
                             <span>{project.name}</span>
                         </>
                         :
@@ -102,9 +106,9 @@ export const MiniProject = ({project}) => {
                     </div>
                 </div>
                 <div className={st.lineBoxes}>
-                    {project.photosId.map((i, id) =>
+                    {project.photos.map((i, id) =>
                         <MiniProjectLine key={id} id={id} onMove={setBackgroundPhoto}
-                                         numOfLines={project.photosId.length}/>
+                                         numOfLines={project.photos.length}/>
                     )}
                 </div>
             </Link>

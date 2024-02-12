@@ -44,6 +44,7 @@ export const OurProjects = () => {
     useEffect(() => {
         axios.get("/projects").then(res => {
             setProjectsInfo(res.data)
+            console.log(res.data)
             // console.log(res.data[0]);
         });
     }, [])

@@ -43,6 +43,36 @@
     align-items: center;
 }
 
+.coordsBlock {
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.coordsFieldsBlock {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.coordsButton {
+    margin: 10px 0;
+    cursor: pointer;
+    font-family: "Noah Head", sans-serif;
+    font-size: 15px;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    color: #ffffff;
+    background-color: #25427E;
+    transition: all 300ms ease-in-out;
+}
+
+.coordsButton:hover {
+    background-color: #3660b8;
+
+}
+
 .textArea {
     height: 300px;
     resize: vertical;
