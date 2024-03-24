@@ -203,16 +203,20 @@ export const EditProject = () => {
             console.log(error.message + ": " + error.response.data.message)
             return
         }
-        for (let key of Object.keys(photoUrl)) {
-            key = parseInt(key)
-            if (key < photo.position - 1) {}
-            else if (key >= photo.position - 1) {
-                photoUrl[key + 1].position = key + 1;
-                photoUrl[key] = photoUrl[key + 1]
-            }
-            if (key === Object.keys(photoUrl).length - 2) {
-                delete photoUrl[key + 1]
-                break
+        if (Object.keys(photoUrl).length === 1) {
+            delete photoUrl[0];
+        } else {
+            for (let key of Object.keys(photoUrl)) {
+                key = parseInt(key)
+                if (key < photo.position - 1) {}
+                else if (key >= photo.position - 1) {
+                    photoUrl[key + 1].position = key + 1;
+                    photoUrl[key] = photoUrl[key + 1]
+                }
+                if (key === Object.keys(photoUrl).length - 2) {
+                    delete photoUrl[key + 1]
+                    break
+                }
             }
         }
         setPhotoUrl({ ...photoUrl})
@@ -274,6 +278,7 @@ export const EditProject = () => {
                     photoUrl[key] = photo;
                 }
                 else if (key <= photo.position - 1) {
+                    console.log(photoUrl)
                     photoUrl[key - 1].position = key + 1;
                     photoUrl[key] = photoUrl[key - 1]
                 }

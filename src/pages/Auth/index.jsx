@@ -5,6 +5,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {fetchAuth, selectIsAuth} from "../../redux/slices/auth";
 import {Redirect} from "react-router-dom";
 import Loader from "../../components/UI/Loader/Loader";
+import {GoogleLogin} from "@react-oauth/google";
 
 
 export const Auth = () => {
@@ -44,6 +45,14 @@ export const Auth = () => {
         <div className={st.container}>
             <div className={st.authBlock}>
                 <span style={{display: "inline-block", fontSize: 26, fontWeight: 400, marginBottom: 10}}>Войти</span>
+                <GoogleLogin
+                    onSuccess={credentialResponse => {
+                        console.log(credentialResponse);
+                    }}
+                    onError={() => {
+                        console.log('Login Failed');
+                    }}
+                />
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <input
                         className={st.input}
